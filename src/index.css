@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..800,0..100&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 46 52% 97%;
+    --foreground: 26 22% 14%;
+
+    --card: 45 36% 95%;
+    --card-foreground: 26 22% 14%;
+
+    --popover: 46 50% 97%;
+    --popover-foreground: 26 22% 14%;
+
+    --primary: 168 54% 33%;
+    --primary-foreground: 46 52% 97%;
+
+    --secondary: 36 95% 58%;
+    --secondary-foreground: 24 20% 15%;
+
+    --muted: 39 38% 90%;
+    --muted-foreground: 25 10% 42%;
+
+    --accent: 12 78% 56%;
+    --accent-foreground: 46 52% 97%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 40 33% 97%;
+
+    --border: 38 35% 84%;
+    --input: 38 35% 84%;
+    --ring: 168 54% 33%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 168 28% 17%;
+    --sidebar-foreground: 46 45% 91%;
+    --sidebar-primary: 36 95% 58%;
+    --sidebar-primary-foreground: 24 20% 15%;
+    --sidebar-accent: 168 24% 24%;
+    --sidebar-accent-foreground: 46 45% 91%;
+    --sidebar-border: 168 18% 27%;
+    --sidebar-ring: 36 95% 58%;
+
+    --gold: 36 95% 58%;
+    --gold-foreground: 24 20% 15%;
+    --ethiopian-green: 168 54% 33%;
+    --ethiopian-red: 12 78% 56%;
+    --warm-sand: 40 54% 88%;
+
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  .dark {
+    --background: 30 10% 8%;
+    --foreground: 40 20% 92%;
+
+    --card: 30 10% 12%;
+    --card-foreground: 40 20% 92%;
+
+    --popover: 30 10% 12%;
+    --popover-foreground: 40 20% 92%;
+
+    --primary: 145 45% 38%;
+    --primary-foreground: 40 33% 97%;
+
+    --secondary: 43 85% 55%;
+    --secondary-foreground: 30 10% 12%;
+
+    --muted: 30 10% 18%;
+    --muted-foreground: 35 15% 55%;
+
+    --accent: 5 70% 55%;
+    --accent-foreground: 40 33% 97%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 40 33% 97%;
+
+    --border: 30 10% 20%;
+    --input: 30 10% 20%;
+    --ring: 145 45% 38%;
+
+    --sidebar-background: 30 10% 6%;
+    --sidebar-foreground: 40 20% 90%;
+    --sidebar-primary: 43 85% 55%;
+    --sidebar-primary-foreground: 30 10% 12%;
+    --sidebar-accent: 30 10% 14%;
+    --sidebar-accent-foreground: 40 20% 90%;
+    --sidebar-border: 30 10% 15%;
+    --sidebar-ring: 43 85% 55%;
+
+    --gold: 43 85% 55%;
+    --gold-foreground: 30 10% 12%;
+    --ethiopian-green: 145 45% 38%;
+    --ethiopian-red: 5 70% 55%;
+    --warm-sand: 35 20% 22%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    background-image:
+      radial-gradient(circle at 8% 10%, hsl(var(--gold) / 0.2), transparent 34%),
+      radial-gradient(circle at 90% 20%, hsl(var(--ethiopian-green) / 0.18), transparent 30%),
+      radial-gradient(circle at 45% 80%, hsl(var(--accent) / 0.1), transparent 36%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--warm-sand) / 0.4) 100%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .gradient-hero {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--ethiopian-green)) 0%,
+      hsl(var(--ethiopian-green) / 0.88) 32%,
+      hsl(var(--accent) / 0.78) 68%,
+      hsl(var(--gold) / 0.9) 100%
+    );
+  }
+
+  .gradient-gold {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--gold)) 0%,
+      hsl(var(--gold) / 0.85) 100%
+    );
+  }
+
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border border-border/60;
+    box-shadow: 0 20px 60px hsl(var(--ethiopian-green) / 0.08);
+  }
+
+  .glass-dark {
+    background: hsl(var(--foreground) / 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--foreground) / 0.08);
+  }
+
+  .geez-float {
+    @apply absolute text-6xl opacity-10 pointer-events-none select-none;
+    font-family: serif;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  }
+
+  .mesh-veil {
+    background-image:
+      radial-gradient(circle at 25% 25%, hsl(var(--secondary) / 0.18), transparent 40%),
+      radial-gradient(circle at 75% 20%, hsl(var(--primary) / 0.22), transparent 42%),
+      radial-gradient(circle at 50% 80%, hsl(var(--accent) / 0.12), transparent 46%);
+  }
+
+  .grain-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(hsl(var(--foreground) / 0.045) 0.5px, transparent 0.5px);
+    background-size: 4px 4px;
+    opacity: 0.25;
+    pointer-events: none;
+  }
+}
