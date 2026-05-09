@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("lingo_token", token);
     localStorage.setItem("lingo_user", JSON.stringify(user));
     const onboarded = localStorage.getItem("lingo_onboarded");
-    setNeedsOnboarding(onboarded !== "true");
+    setNeedsOnboarding(user.role === "learner" && onboarded !== "true");
   }, []);
 
   const signup = useCallback((user: User, token: string) => {
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setToken(token);
     localStorage.setItem("lingo_token", token);
     localStorage.setItem("lingo_user", JSON.stringify(user));
-    setNeedsOnboarding(true);
+    setNeedsOnboarding(user.role === "learner");
   }, []);
 
   const logout = useCallback(() => {

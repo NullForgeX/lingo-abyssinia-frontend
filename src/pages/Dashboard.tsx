@@ -127,6 +127,17 @@ const Dashboard = () => {
           </motion.div>
         ))}
       </div>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <Link to="/progress/streaks" className="text-sm font-medium text-primary hover:underline">
+          View streak history
+        </Link>
+        <Link to="/progress/badges" className="text-sm font-medium text-primary hover:underline">
+          View badge history
+        </Link>
+        <Link to="/progress/skills" className="text-sm font-medium text-primary hover:underline">
+          View per-skill chart
+        </Link>
+      </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-3">
         <motion.div
@@ -173,6 +184,12 @@ const Dashboard = () => {
               <ArrowRight className="h-4 w-4" />
             </Link>
           )}
+          <Link
+            to="/language-selection"
+            className="mt-3 block text-sm font-medium text-primary hover:underline"
+          >
+            Change language preference
+          </Link>
         </motion.div>
       </div>
 

@@ -1,3 +1,8 @@
+## Admin Credentials
+
+- Email: `admin@lingoabyssinia.com` (any email containing `admin` works)
+- Password: any value with at least 8 characters
+
 # Lingo Abyssinia Foundation
 
 Lingo Abyssinia Foundation is a frontend language-learning app focused on

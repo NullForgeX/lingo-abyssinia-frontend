@@ -1,5 +1,6 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
 import {
+  House,
   BookOpen,
   Trophy,
   User,
@@ -23,6 +24,7 @@ const AppShell = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
+    { label: "Home", icon: House, path: "/home" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
     { label: "Community", icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },

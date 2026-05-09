@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, Mail, Target, BookOpen, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -178,6 +179,20 @@ const Profile = () => {
               </p>
             )}
           </div>
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link to="/language-selection" className="text-sm font-medium text-primary hover:underline">
+            Language selection
+          </Link>
+          <Link to="/progress/streaks" className="text-sm font-medium text-primary hover:underline">
+            Streak history
+          </Link>
+          <Link to="/progress/badges" className="text-sm font-medium text-primary hover:underline">
+            Badge history
+          </Link>
+          <Link to="/progress/skills" className="text-sm font-medium text-primary hover:underline">
+            Per-skill chart
+          </Link>
         </div>
 
         {isEditing && (

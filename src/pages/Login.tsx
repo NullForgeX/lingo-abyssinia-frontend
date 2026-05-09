@@ -40,7 +40,7 @@ const Login = () => {
     try {
       const result = await mockLogin(data.email, data.password);
       login(result.user, result.token);
-      navigate("/dashboard");
+      navigate(result.user.role === "admin" ? "/admin" : "/home");
     } finally {
       setLoading(false);
     }
@@ -136,6 +136,14 @@ const Login = () => {
                   {errors.password.message}
                 </p>
               )}
+              <div className="mt-2 text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
             <Button
               type="submit"

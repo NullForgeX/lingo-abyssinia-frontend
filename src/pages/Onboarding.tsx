@@ -74,7 +74,7 @@ const Onboarding = () => {
     if (selectedLang && selectedGoal) {
       setPreferences({ language: selectedLang, dailyGoal: selectedGoal });
       completeOnboarding();
-      navigate("/dashboard");
+      navigate("/home");
     }
   };
 
