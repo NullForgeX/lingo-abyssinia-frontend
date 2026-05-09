@@ -24,9 +24,9 @@ const AppShell = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { label: "Home", icon: House, path: "/home" },
+    { label: t("app.home"), icon: House, path: "/home" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
-    { label: "Community", icon: MessageSquare, path: "/community" },
+    { label: t("app.community"), icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
     { label: t("app.profile"), icon: User, path: "/profile" },
   ];
@@ -144,9 +144,9 @@ const AppShell = () => {
             <ThemeToggle iconOnly />
             <LanguageSwitcher iconOnly />
           </div>
-          <div className="hidden md:flex items-center gap-2">
-            <ThemeToggle />
-            <LanguageSwitcher />
+          <div className="hidden md:flex items-center gap-1.5">
+            <ThemeToggle iconOnly />
+            <LanguageSwitcher iconOnly />
             <span className="text-sm text-muted-foreground">
               {user?.name ?? "Learner"}
             </span>

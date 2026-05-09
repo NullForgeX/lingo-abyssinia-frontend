@@ -13,9 +13,11 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useLessonProgress } from "@/hooks/useLessonProgress";
 import { getCourse } from "@/data/courseContent";
+import { useI18n } from "@/contexts/I18nContext";
 
 const Home = () => {
   const { user } = useAuth();
+  const { t } = useI18n();
   const { completedLessons } = useLessonProgress();
 
   const course = getCourse(user?.selectedLanguage ?? "amharic");
@@ -24,29 +26,29 @@ const Home = () => {
 
   const quickLinks = [
     {
-      title: "Language Selection",
-      desc: "Pick or update your learning language.",
+      title: t("home.languageSelection"),
+      desc: t("home.languageSelectionDesc"),
       to: "/language-selection",
       icon: Languages,
       accent: "from-primary/20 to-primary/5",
     },
     {
-      title: "Streak History",
-      desc: "See your daily practice consistency.",
+      title: t("home.streakHistory"),
+      desc: t("home.streakHistoryDesc"),
       to: "/progress/streaks",
       icon: Flame,
       accent: "from-accent/20 to-accent/5",
     },
     {
-      title: "Badge History",
-      desc: "Review badges and milestones earned.",
+      title: t("home.badgeHistory"),
+      desc: t("home.badgeHistoryDesc"),
       to: "/progress/badges",
       icon: BadgeCheck,
       accent: "from-secondary/20 to-secondary/5",
     },
     {
-      title: "Per-Skill Chart",
-      desc: "Track progress across core skills.",
+      title: t("home.skillChart"),
+      desc: t("home.skillChartDesc"),
       to: "/progress/skills",
       icon: BarChart3,
       accent: "from-primary/10 to-secondary/10",
@@ -58,7 +60,7 @@ const Home = () => {
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-secondary/10 to-background p-6 md:p-8"
+        className="relative overflow-hidden rounded-3xl border border-primary/20 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.22),transparent_40%),radial-gradient(circle_at_12%_90%,hsl(var(--secondary)/0.2),transparent_36%),linear-gradient(140deg,hsl(var(--card))_0%,hsl(var(--card)/0.92)_50%,hsl(var(--background))_100%)] p-6 md:p-8"
       >
         <div className="absolute -top-24 right-0 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
@@ -67,10 +69,10 @@ const Home = () => {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               <HomeIcon className="h-3.5 w-3.5" />
-              HOME
+              {t("app.home")}
             </div>
             <h1 className="mt-3 font-display text-2xl font-bold text-foreground md:text-4xl">
-              Welcome back, {user?.name ?? "Learner"}
+              {t("dashboard.welcome")}, {user?.name ?? "Learner"}
             </h1>
             <p className="mt-2 max-w-2xl text-muted-foreground">
               Your central hub for language tools, progress insights, and shortcuts.
@@ -81,32 +83,32 @@ const Home = () => {
             to="/dashboard"
             className="inline-flex items-center gap-2 self-start rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:brightness-105"
           >
-            Go to Learn
+            {t("home.goToLearn")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </motion.section>
 
       <section className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
+        <div className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Current Streak</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.currentStreak")}</p>
             <Flame className="h-5 w-5 text-accent" />
           </div>
           <p className="mt-2 font-display text-2xl font-bold text-foreground">{user?.streak ?? 0} days</p>
         </div>
-        <div className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
+        <div className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Lessons Complete</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.lessonsDone")}</p>
             <BookOpen className="h-5 w-5 text-primary" />
           </div>
           <p className="mt-2 font-display text-2xl font-bold text-foreground">
             {completedLessons.length}/{totalLessons}
           </p>
         </div>
-        <div className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
+        <div className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Gems Earned</p>
+            <p className="text-sm text-muted-foreground">{t("dashboard.gemsEarned")}</p>
             <Trophy className="h-5 w-5 text-secondary" />
           </div>
           <p className="mt-2 font-display text-2xl font-bold text-foreground">{user?.gems ?? 0}</p>
@@ -114,7 +116,7 @@ const Home = () => {
       </section>
 
       <section className="mt-8">
-        <h2 className="font-display text-xl font-bold text-foreground">Quick Access</h2>
+        <h2 className="font-display text-xl font-bold text-foreground">{t("home.quickAccess")}</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {quickLinks.map((item, i) => (
             <motion.div
@@ -137,7 +139,7 @@ const Home = () => {
                     <item.icon className="h-5 w-5 text-primary" />
                   </div>
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                    Open
+                    {t("home.open")}
                     <ArrowRight className="h-4 w-4" />
                   </span>
                 </div>
@@ -148,7 +150,7 @@ const Home = () => {
       </section>
 
       <section className="mt-8 rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
-        <h2 className="font-display text-lg font-bold text-foreground">General Info</h2>
+        <h2 className="font-display text-lg font-bold text-foreground">{t("home.generalInfo")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Daily goal: {user?.dailyGoal ?? 15} minutes. Overall completion: {completion}%. Continue from Learn to keep your streak active and unlock more badges.
         </p>

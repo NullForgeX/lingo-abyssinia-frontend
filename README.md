@@ -1,7 +1,7 @@
 ## Admin Credentials
 
-- Email: `admin@lingoabyssinia.com` (any email containing `admin` works)
-- Password: any value with at least 8 characters
+- Email: `admin@lingoabyssinia.com`
+- Password: password
 
 # Lingo Abyssinia Foundation
 

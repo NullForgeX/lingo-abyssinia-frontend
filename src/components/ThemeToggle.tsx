@@ -16,7 +16,7 @@ const ThemeToggle = ({ className = "", iconOnly = false }: Props) => {
       type="button"
       variant="outline"
       onClick={toggleTheme}
-      className={`group rounded-2xl border-border/70 bg-card/80 text-foreground shadow-sm backdrop-blur-md transition hover:border-primary/40 hover:bg-card ${iconOnly ? "h-9 w-9 p-0" : "px-3.5"} ${className}`}
+      className={`group rounded-xl border-border/60 bg-card/70 text-foreground shadow-sm backdrop-blur-md transition hover:border-primary/40 hover:bg-card ${iconOnly ? "h-8 w-8 p-0" : "h-8 px-2.5"} ${className}`}
       aria-label="Toggle light and dark theme"
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >

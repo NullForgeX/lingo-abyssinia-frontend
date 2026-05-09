@@ -1,12 +1,10 @@
 export interface Exercise {
   id: string;
-  type: 'multiple-choice' | 'translation' | 'audio';
+  type: "multiple-choice" | "translation" | "audio";
   question: string;
-  /** For audio exercises, the phonetic or script to pronounce */
   audioText?: string;
   options?: string[];
   correctAnswer: string;
-  /** Optional image hint */
   image?: string;
 }
 
@@ -26,414 +24,203 @@ export interface Unit {
 }
 
 export interface Course {
-  language: 'amharic' | 'oromo' | 'tigrinya';
+  language: "amharic" | "oromo" | "tigrinya";
   units: Unit[];
 }
 
-const amharicCourse: Course = {
-  language: 'amharic',
-  units: [
-    {
-      id: 'am-u1',
-      title: 'Greetings',
-      description: 'Learn basic greetings and introductions',
-      lessons: [
-        {
-          id: 'am-u1-l1',
-          title: 'Hello & Goodbye',
-          description: 'Basic greetings',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'am-u1-l1-e1',
-              type: 'multiple-choice',
-              question: 'What does "ሰላም" (Selam) mean?',
-              options: ['Hello', 'Goodbye', 'Thank you', 'Please'],
-              correctAnswer: 'Hello',
-            },
-            {
-              id: 'am-u1-l1-e2',
-              type: 'translation',
-              question: 'Translate to English: "ደህና ሁን"',
-              correctAnswer: 'Goodbye',
-            },
-            {
-              id: 'am-u1-l1-e3',
-              type: 'audio',
-              question: 'Listen and select the correct meaning',
-              audioText: 'ሰላም',
-              options: ['Hello / Peace', 'Water', 'Food', 'House'],
-              correctAnswer: 'Hello / Peace',
-            },
-            {
-              id: 'am-u1-l1-e4',
-              type: 'multiple-choice',
-              question: 'How do you say "Good morning" in Amharic?',
-              options: ['እንደምን አደርክ', 'ሰላም', 'አመሰግናለሁ', 'ይቅርታ'],
-              correctAnswer: 'እንደምን አደርክ',
-            },
-            {
-              id: 'am-u1-l1-e5',
-              type: 'translation',
-              question: 'Translate to Amharic: "Hello"',
-              correctAnswer: 'ሰላም',
-            },
-          ],
-        },
-        {
-          id: 'am-u1-l2',
-          title: 'How are you?',
-          description: 'Asking about well-being',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'am-u1-l2-e1',
-              type: 'multiple-choice',
-              question: 'What does "እንደምን ነህ?" mean?',
-              options: ['How are you?', 'What is your name?', 'Where are you?', 'Who are you?'],
-              correctAnswer: 'How are you?',
-            },
-            {
-              id: 'am-u1-l2-e2',
-              type: 'translation',
-              question: 'Translate: "I am fine" → Amharic',
-              correctAnswer: 'ደህና ነኝ',
-            },
-            {
-              id: 'am-u1-l2-e3',
-              type: 'audio',
-              question: 'Listen and choose the correct phrase',
-              audioText: 'እንደምን ነህ',
-              options: ['How are you?', 'Good night', 'See you later', 'Welcome'],
-              correctAnswer: 'How are you?',
-            },
-            {
-              id: 'am-u1-l2-e4',
-              type: 'multiple-choice',
-              question: '"አመሰግናለሁ" means:',
-              options: ['Thank you', 'Sorry', 'Please', 'Yes'],
-              correctAnswer: 'Thank you',
-            },
-          ],
-        },
-        {
-          id: 'am-u1-l3',
-          title: 'Introductions',
-          description: 'Tell people your name',
-          xpReward: 15,
-          exercises: [
-            {
-              id: 'am-u1-l3-e1',
-              type: 'multiple-choice',
-              question: 'How do you say "My name is..." in Amharic?',
-              options: ['ስሜ ... ነው', 'ቤቴ ... ነው', 'ሀገሬ ... ነው', 'ሥራዬ ... ነው'],
-              correctAnswer: 'ስሜ ... ነው',
-            },
-            {
-              id: 'am-u1-l3-e2',
-              type: 'translation',
-              question: 'Translate: "What is your name?"',
-              correctAnswer: 'ስምህ ማን ነው',
-            },
-            {
-              id: 'am-u1-l3-e3',
-              type: 'audio',
-              question: 'Listen and identify the phrase',
-              audioText: 'ስሜ ዳዊት ነው',
-              options: ['My name is Dawit', 'I am a student', 'I live in Addis', 'I am happy'],
-              correctAnswer: 'My name is Dawit',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'am-u2',
-      title: 'Numbers',
-      description: 'Learn to count in Amharic',
-      lessons: [
-        {
-          id: 'am-u2-l1',
-          title: 'Numbers 1-5',
-          description: 'Count from one to five',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'am-u2-l1-e1',
-              type: 'multiple-choice',
-              question: 'What is "አንድ" in English?',
-              options: ['One', 'Two', 'Three', 'Four'],
-              correctAnswer: 'One',
-            },
-            {
-              id: 'am-u2-l1-e2',
-              type: 'translation',
-              question: 'Translate: "Three"',
-              correctAnswer: 'ሦስት',
-            },
-            {
-              id: 'am-u2-l1-e3',
-              type: 'audio',
-              question: 'Listen: which number is this?',
-              audioText: 'ሁለት',
-              options: ['Two', 'Five', 'One', 'Four'],
-              correctAnswer: 'Two',
-            },
-            {
-              id: 'am-u2-l1-e4',
-              type: 'multiple-choice',
-              question: '"አምስት" means:',
-              options: ['Five', 'Ten', 'Three', 'Seven'],
-              correctAnswer: 'Five',
-            },
-          ],
-        },
-        {
-          id: 'am-u2-l2',
-          title: 'Numbers 6-10',
-          description: 'Count from six to ten',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'am-u2-l2-e1',
-              type: 'multiple-choice',
-              question: 'What is "ስድስት" in English?',
-              options: ['Six', 'Seven', 'Eight', 'Nine'],
-              correctAnswer: 'Six',
-            },
-            {
-              id: 'am-u2-l2-e2',
-              type: 'translation',
-              question: 'Translate "Ten" to Amharic',
-              correctAnswer: 'አስር',
-            },
-            {
-              id: 'am-u2-l2-e3',
-              type: 'audio',
-              question: 'Listen: which number?',
-              audioText: 'ዘጠኝ',
-              options: ['Nine', 'Six', 'Eight', 'Seven'],
-              correctAnswer: 'Nine',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'am-u3',
-      title: 'Family',
-      description: 'Learn family member vocabulary',
-      lessons: [
-        {
-          id: 'am-u3-l1',
-          title: 'Parents & Siblings',
-          description: 'Mother, father, brother, sister',
-          xpReward: 15,
-          exercises: [
-            {
-              id: 'am-u3-l1-e1',
-              type: 'multiple-choice',
-              question: '"እናት" means:',
-              options: ['Mother', 'Father', 'Sister', 'Brother'],
-              correctAnswer: 'Mother',
-            },
-            {
-              id: 'am-u3-l1-e2',
-              type: 'translation',
-              question: 'Translate: "Father"',
-              correctAnswer: 'አባት',
-            },
-            {
-              id: 'am-u3-l1-e3',
-              type: 'audio',
-              question: 'Listen and choose',
-              audioText: 'ወንድም',
-              options: ['Brother', 'Sister', 'Uncle', 'Cousin'],
-              correctAnswer: 'Brother',
-            },
-            {
-              id: 'am-u3-l1-e4',
-              type: 'multiple-choice',
-              question: 'How do you say "Sister"?',
-              options: ['እህት', 'እናት', 'ሴት', 'ልጅ'],
-              correctAnswer: 'እህት',
-            },
-          ],
-        },
-      ],
-    },
-  ],
+type Lang = Course["language"];
+
+type Lexicon = {
+  greeting: string;
+  thanks: string;
+  goodbye: string;
+  yes: string;
+  no: string;
+  numbers: string[];
+  people: string[];
+  places: string[];
+  foods: string[];
+  verbs: string[];
 };
 
-const oromoCourse: Course = {
-  language: 'oromo',
-  units: [
-    {
-      id: 'or-u1',
-      title: 'Greetings',
-      description: 'Basic Afaan Oromo greetings',
-      lessons: [
-        {
-          id: 'or-u1-l1',
-          title: 'Hello & Goodbye',
-          description: 'Learn to greet in Oromo',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'or-u1-l1-e1',
-              type: 'multiple-choice',
-              question: 'What does "Akkam" mean?',
-              options: ['How are you?', 'Hello', 'Goodbye', 'Thank you'],
-              correctAnswer: 'How are you?',
-            },
-            {
-              id: 'or-u1-l1-e2',
-              type: 'translation',
-              question: 'Translate: "Nagaatti" to English',
-              correctAnswer: 'Goodbye',
-            },
-            {
-              id: 'or-u1-l1-e3',
-              type: 'audio',
-              question: 'Listen and select the meaning',
-              audioText: 'Akkam',
-              options: ['How are you?', 'Welcome', 'Good night', 'Please'],
-              correctAnswer: 'How are you?',
-            },
-            {
-              id: 'or-u1-l1-e4',
-              type: 'multiple-choice',
-              question: '"Galatoomaa" means:',
-              options: ['Thank you', 'Sorry', 'Yes', 'No'],
-              correctAnswer: 'Thank you',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'or-u2',
-      title: 'Numbers',
-      description: 'Count in Afaan Oromo',
-      lessons: [
-        {
-          id: 'or-u2-l1',
-          title: 'Numbers 1-5',
-          description: 'Basic counting',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'or-u2-l1-e1',
-              type: 'multiple-choice',
-              question: '"Tokko" means:',
-              options: ['One', 'Two', 'Three', 'Five'],
-              correctAnswer: 'One',
-            },
-            {
-              id: 'or-u2-l1-e2',
-              type: 'translation',
-              question: 'Translate: "Three" to Oromo',
-              correctAnswer: 'Sadii',
-            },
-            {
-              id: 'or-u2-l1-e3',
-              type: 'audio',
-              question: 'Listen: which number?',
-              audioText: 'Lama',
-              options: ['Two', 'Four', 'One', 'Five'],
-              correctAnswer: 'Two',
-            },
-          ],
-        },
-      ],
-    },
-  ],
+const lexicons: Record<Lang, Lexicon> = {
+  amharic: {
+    greeting: "Selam",
+    thanks: "Ameseginalehu",
+    goodbye: "Dehna hun",
+    yes: "Awo",
+    no: "Aydellem",
+    numbers: ["and", "hulet", "sost", "arat", "amist", "sidist", "sebat", "siment", "zetegn", "asir"],
+    people: ["enat", "abat", "wendim", "ehet", "memhir", "temari"],
+    places: ["bet", "suq", "timhirt bet", "addis", "mender"],
+    foods: ["injera", "shiro", "buna", "dabo", "wot"],
+    verbs: ["hed", "metta", "bel", "teyik", "moker"],
+  },
+  oromo: {
+    greeting: "Nagaa",
+    thanks: "Galatoomaa",
+    goodbye: "Nagaatti",
+    yes: "Eeyyee",
+    no: "Lakki",
+    numbers: ["tokko", "lama", "sadii", "afur", "shan", "jaha", "torba", "saddeet", "sagal", "kudhan"],
+    people: ["haadha", "abba", "obboleessa", "obboleettii", "barsiisaa", "barataa"],
+    places: ["mana", "gabaa", "mana barumsaa", "magaalaa", "baadiyyaa"],
+    foods: ["buddeena", "ittoo", "buna", "annaan", "foon"],
+    verbs: ["deemi", "kottu", "nyaadhu", "gaafadhu", "shaakali"],
+  },
+  tigrinya: {
+    greeting: "Selam",
+    thanks: "Yekenyeley",
+    goodbye: "Dehan kun",
+    yes: "Ee",
+    no: "Aykonen",
+    numbers: ["hade", "kilte", "seleste", "arbaete", "hamushte", "shudushte", "shewate", "shimente", "tishate", "aserte"],
+    people: ["ade", "ab", "haw", "hafti", "memhir", "temhari"],
+    places: ["geza", "suuq", "bet timhrti", "asmera", "qushet"],
+    foods: ["injera", "shiro", "buna", "himbasha", "tsahli"],
+    verbs: ["deyeb", "nsi", "bela", "hato", "moker"],
+  },
 };
 
-const tigrinyaCourse: Course = {
-  language: 'tigrinya',
-  units: [
+const unitBlueprints: Array<{ title: string; description: string; lessonTitles: string[] }> = [
+  {
+    title: "Foundations",
+    description: "Greetings, polite phrases, and survival basics.",
+    lessonTitles: ["Hello and Goodbye", "Polite Words", "Introducing Yourself", "Simple Questions", "Mini Conversation"],
+  },
+  {
+    title: "Numbers and Time",
+    description: "Count, tell time, and discuss schedules.",
+    lessonTitles: ["Numbers 1-10", "Numbers 11-100", "Days of Week", "Telling Time", "Daily Schedule"],
+  },
+  {
+    title: "People and Family",
+    description: "Talk about family, friends, and roles.",
+    lessonTitles: ["Family Members", "Describing People", "Professions", "Age and Birthday", "Social Introductions"],
+  },
+  {
+    title: "Home and Places",
+    description: "Navigate locations and home vocabulary.",
+    lessonTitles: ["Home Vocabulary", "Directions", "Neighborhood", "At School", "City vs Village"],
+  },
+  {
+    title: "Food and Market",
+    description: "Order food and shop with confidence.",
+    lessonTitles: ["Common Foods", "At the Market", "Ordering Meals", "Quantities and Prices", "Food Preferences"],
+  },
+  {
+    title: "Actions and Verbs",
+    description: "Core verbs and sentence building.",
+    lessonTitles: ["Common Verbs", "Present Actions", "Past Actions", "Future Plans", "Mixed Practice"],
+  },
+  {
+    title: "Travel and Transport",
+    description: "Move around and ask travel questions.",
+    lessonTitles: ["Transportation Words", "Buying Tickets", "Asking Routes", "At the Station", "Trip Dialogues"],
+  },
+  {
+    title: "Health and Wellbeing",
+    description: "Explain basic health needs and feelings.",
+    lessonTitles: ["Body and Feelings", "At the Clinic", "Describing Symptoms", "Advice and Help", "Health Check Dialogue"],
+  },
+  {
+    title: "Work and Study",
+    description: "Use language in school and workplace contexts.",
+    lessonTitles: ["Classroom Language", "Office Expressions", "Tasks and Deadlines", "Meetings and Notes", "Formal Conversation"],
+  },
+  {
+    title: "Culture and Community",
+    description: "Learn language tied to culture and social life.",
+    lessonTitles: ["Holidays", "Community Events", "Traditions", "Music and Stories", "Cultural Dialogue"],
+  },
+  {
+    title: "Intermediate Fluency",
+    description: "Longer comprehension and response drills.",
+    lessonTitles: ["Listening Practice", "Reading Short Texts", "Responding Naturally", "Error Correction", "Fluency Challenge"],
+  },
+  {
+    title: "Mastery Path",
+    description: "Advanced mixed practice and review.",
+    lessonTitles: ["Advanced Vocabulary", "Complex Sentences", "Scenario Simulation", "Fast Review", "Final Mastery Test"],
+  },
+];
+
+function pick<T>(arr: T[], seed: number): T {
+  return arr[seed % arr.length];
+}
+
+function makeExercises(language: Lang, lessonId: string, lessonTitle: string, seed: number): Exercise[] {
+  const lx = lexicons[language];
+  const n1 = pick(lx.numbers, seed);
+  const n2 = pick(lx.numbers, seed + 2);
+  const person = pick(lx.people, seed + 1);
+  const place = pick(lx.places, seed + 3);
+  const food = pick(lx.foods, seed + 4);
+  const verb = pick(lx.verbs, seed + 5);
+
+  return [
     {
-      id: 'ti-u1',
-      title: 'Greetings',
-      description: 'Basic Tigrinya greetings',
-      lessons: [
-        {
-          id: 'ti-u1-l1',
-          title: 'Hello & Goodbye',
-          description: 'Greet in Tigrinya',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'ti-u1-l1-e1',
-              type: 'multiple-choice',
-              question: 'What does "ሰላም" mean in Tigrinya?',
-              options: ['Hello', 'Goodbye', 'Sorry', 'Thanks'],
-              correctAnswer: 'Hello',
-            },
-            {
-              id: 'ti-u1-l1-e2',
-              type: 'translation',
-              question: 'Translate: "ደሓን ኩን" to English',
-              correctAnswer: 'Goodbye',
-            },
-            {
-              id: 'ti-u1-l1-e3',
-              type: 'audio',
-              question: 'Listen and choose',
-              audioText: 'ከመይ ኣለኻ',
-              options: ['How are you?', 'Good morning', 'Thank you', 'Welcome'],
-              correctAnswer: 'How are you?',
-            },
-            {
-              id: 'ti-u1-l1-e4',
-              type: 'multiple-choice',
-              question: '"የቐንየለይ" means:',
-              options: ['Thank you', 'Please', 'Sorry', 'Yes'],
-              correctAnswer: 'Thank you',
-            },
-          ],
-        },
-      ],
+      id: `${lessonId}-e1`,
+      type: "multiple-choice",
+      question: `In ${lessonTitle}, pick the polite phrase used most for gratitude in ${language}.`,
+      options: [lx.thanks, lx.greeting, lx.goodbye, lx.no],
+      correctAnswer: lx.thanks,
     },
     {
-      id: 'ti-u2',
-      title: 'Numbers',
-      description: 'Count in Tigrinya',
-      lessons: [
-        {
-          id: 'ti-u2-l1',
-          title: 'Numbers 1-5',
-          description: 'Basic counting',
-          xpReward: 10,
-          exercises: [
-            {
-              id: 'ti-u2-l1-e1',
-              type: 'multiple-choice',
-              question: '"ሓደ" means:',
-              options: ['One', 'Two', 'Three', 'Four'],
-              correctAnswer: 'One',
-            },
-            {
-              id: 'ti-u2-l1-e2',
-              type: 'translation',
-              question: 'Translate "Two" to Tigrinya',
-              correctAnswer: 'ክልተ',
-            },
-            {
-              id: 'ti-u2-l1-e3',
-              type: 'audio',
-              question: 'Listen: which number?',
-              audioText: 'ሰለስተ',
-              options: ['Three', 'Five', 'One', 'Four'],
-              correctAnswer: 'Three',
-            },
-          ],
-        },
-      ],
+      id: `${lessonId}-e2`,
+      type: "translation",
+      question: `Translate this target word to ${language}: "yes"`,
+      correctAnswer: lx.yes,
     },
-  ],
-};
+    {
+      id: `${lessonId}-e3`,
+      type: "audio",
+      question: `Listen and choose the best meaning for "${person} ${verb}" in context.`,
+      audioText: `${person} ${verb}`,
+      options: ["person + action", "food + action", "place + time", "number + greeting"],
+      correctAnswer: "person + action",
+    },
+    {
+      id: `${lessonId}-e4`,
+      type: "multiple-choice",
+      question: `Which option is a valid ${language} study phrase from this lesson set?`,
+      options: [`${lx.greeting} ${n1}`, `${food} ${place}`, `${n2} ${lx.goodbye}`, `${lx.no} ${lx.thanks}`],
+      correctAnswer: `${lx.greeting} ${n1}`,
+    },
+  ];
+}
+
+function makeCourse(language: Lang, prefix: string): Course {
+  const units: Unit[] = unitBlueprints.map((unit, unitIndex) => {
+    const unitId = `${prefix}-u${unitIndex + 1}`;
+
+    const lessons: Lesson[] = unit.lessonTitles.map((title, lessonIndex) => {
+      const lessonId = `${unitId}-l${lessonIndex + 1}`;
+      const seed = unitIndex * 10 + lessonIndex;
+
+      return {
+        id: lessonId,
+        title,
+        description: `${unit.description} Focus: ${title}.`,
+        xpReward: 12 + (lessonIndex % 4) * 3 + Math.floor(unitIndex / 3) * 2,
+        exercises: makeExercises(language, lessonId, title, seed),
+      };
+    });
+
+    return {
+      id: unitId,
+      title: unit.title,
+      description: unit.description,
+      lessons,
+    };
+  });
+
+  return { language, units };
+}
+
+const amharicCourse = makeCourse("amharic", "am");
+const oromoCourse = makeCourse("oromo", "or");
+const tigrinyaCourse = makeCourse("tigrinya", "ti");
 
 export const courses: Record<string, Course> = {
   amharic: amharicCourse,
@@ -448,7 +235,7 @@ export function getCourse(language: string): Course {
 export function getLesson(language: string, lessonId: string): Lesson | undefined {
   const course = getCourse(language);
   for (const unit of course.units) {
-    const lesson = unit.lessons.find(l => l.id === lessonId);
+    const lesson = unit.lessons.find((l) => l.id === lessonId);
     if (lesson) return lesson;
   }
   return undefined;
