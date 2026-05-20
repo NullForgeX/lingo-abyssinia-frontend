@@ -1,4 +1,4 @@
-﻿import type { AuthError, Session, User as SupabaseUser } from "@supabase/supabase-js";
+import type { AuthError, Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { User, UserPreferences } from "@/types";
 
@@ -175,7 +175,7 @@ export const updatePassword = async (password: string) => {
 
 export const updateProfile = async (
   userId: string,
-  updates: Partial<Pick<User, "name" | "selectedLanguage" | "dailyGoal">> & {
+  updates: Partial<Pick<User, "name" | "selectedLanguage" | "dailyGoal" | "streak" | "gems">> & {
     email?: string;
     onboarded?: boolean;
   },
@@ -188,6 +188,8 @@ export const updateProfile = async (
     payload.selected_language = updates.selectedLanguage;
   }
   if (updates.dailyGoal !== undefined) payload.daily_goal = updates.dailyGoal;
+  if (updates.streak !== undefined) payload.streak = updates.streak;
+  if (updates.gems !== undefined) payload.gems = updates.gems;
   if (updates.onboarded !== undefined) payload.onboarded = updates.onboarded;
 
   const { data, error } = await supabase

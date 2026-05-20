@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   createContext,
   useContext,
   useState,
@@ -25,7 +25,7 @@ interface AuthContextType {
   setPreferences: (prefs: UserPreferences) => Promise<void>;
   updateUser: (
     updates: Partial<
-      Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal">
+      Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal" | "streak" | "gems">
     >,
   ) => Promise<void>;
   needsOnboarding: boolean;
@@ -133,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateUser = useCallback(
     async (
       updates: Partial<
-        Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal">
+        Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal" | "streak" | "gems">
       >,
     ) => {
       if (!user) return;

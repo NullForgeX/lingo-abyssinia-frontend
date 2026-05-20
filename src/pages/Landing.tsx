@@ -17,13 +17,13 @@ import ThemeToggle from "@/components/ThemeToggle";
 const languages = [
   {
     language: "Amharic",
-    greeting: "ሰላም",
-    script: "አ",
+    greeting: "áˆ°áˆ‹áˆ",
+    script: "áŠ ",
     description:
       "The official language of Ethiopia, spoken by over 30 million people.",
   },
   {
-    language: "Oromo",
+    language: "Afan Oromoo",
     greeting: "Nagaa",
     script: "O",
     description:
@@ -31,8 +31,8 @@ const languages = [
   },
   {
     language: "Tigrinya",
-    greeting: "ሰላም",
-    script: "ት",
+    greeting: "áˆ°áˆ‹áˆ",
+    script: "á‰µ",
     description: "A Semitic language spoken in northern Ethiopia and Eritrea.",
   },
 ];
@@ -125,7 +125,7 @@ const Landing = () => {
         </div>
       </motion.nav>
 
-      {/* ───── Hero ───── */}
+      {/* â”€â”€â”€â”€â”€ Hero â”€â”€â”€â”€â”€ */}
       <section
         id="hero"
         ref={heroRef}
@@ -231,7 +231,7 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      {/* ───── Features ───── */}
+      {/* â”€â”€â”€â”€â”€ Features â”€â”€â”€â”€â”€ */}
       <section id="features" className="relative py-24 md:py-32">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--secondary)/0.18),transparent_44%),radial-gradient(circle_at_85%_65%,hsl(var(--primary)/0.16),transparent_42%)]" />
         <div className="mx-auto max-w-6xl px-6">
@@ -283,7 +283,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ───── Language Cards ───── */}
+      {/* â”€â”€â”€â”€â”€ Language Cards â”€â”€â”€â”€â”€ */}
       <section id="languages" className="relative py-24 md:py-32 bg-muted/35">
         {/* Subtle background pattern */}
         <div
@@ -309,7 +309,7 @@ const Landing = () => {
               {t("landing.startPath")}
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Pick one to begin — you can always switch or add more later.
+              Pick one to begin â€” you can always switch or add more later.
             </p>
           </motion.div>
 
@@ -330,7 +330,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ───── CTA ───── */}
+      {/* â”€â”€â”€â”€â”€ CTA â”€â”€â”€â”€â”€ */}
       <section id="start" className="relative py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 gradient-hero opacity-95" />
         <div className="absolute inset-0 mesh-veil" />
@@ -372,17 +372,17 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ───── Footer ───── */}
+      {/* â”€â”€â”€â”€â”€ Footer â”€â”€â”€â”€â”€ */}
       <footer className="border-t border-border bg-card/90 backdrop-blur-sm px-6 py-10">
         <div className="mx-auto max-w-5xl flex flex-col items-center gap-4 md:flex-row md:justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🇪🇹</span>
+            <span className="text-xl">ðŸ‡ªðŸ‡¹</span>
             <span className="font-display text-lg font-bold text-foreground">
               LingoAbyssinia
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {t("landing.footer")}
+            Â© {t("landing.footer")}
           </p>
         </div>
       </footer>

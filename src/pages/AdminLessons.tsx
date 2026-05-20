@@ -115,7 +115,7 @@ const AdminLessons = () => {
             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
           >
             <option value="amharic">Amharic</option>
-            <option value="oromo">Oromo</option>
+            <option value="oromo">Afan Oromoo</option>
             <option value="tigrinya">Tigrinya</option>
           </select>
           <select
@@ -154,7 +154,7 @@ const AdminLessons = () => {
           <select aria-label="Filter language" value={filterLanguage} onChange={(e) => { setFilterLanguage(e.target.value as any); setPage(1); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
             <option value="all">All languages</option>
             <option value="amharic">Amharic</option>
-            <option value="oromo">Oromo</option>
+            <option value="oromo">Afan Oromoo</option>
             <option value="tigrinya">Tigrinya</option>
           </select>
           <select aria-label="Filter status" value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as any); setPage(1); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm">

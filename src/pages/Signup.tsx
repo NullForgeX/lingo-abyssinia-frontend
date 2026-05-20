@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,12 @@ const schema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters").max(50),
     email: z.string().email("Please enter a valid email"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Add at least one uppercase letter")
+      .regex(/[a-z]/, "Add at least one lowercase letter")
+      .regex(/[0-9]/, "Add at least one number"),
     confirmPassword: z.string(),
   })
   .refine((d) => d.password === d.confirmPassword, {
@@ -27,6 +32,16 @@ const schema = z
   });
 
 type FormData = z.infer<typeof schema>;
+
+const passwordRules = [
+  { label: "At least 8 characters", test: (value: string) => value.length >= 8 },
+  { label: "One uppercase letter", test: (value: string) => /[A-Z]/.test(value) },
+  { label: "One lowercase letter", test: (value: string) => /[a-z]/.test(value) },
+  { label: "One number", test: (value: string) => /[0-9]/.test(value) },
+  { label: "One symbol for extra strength", test: (value: string) => /[^A-Za-z0-9]/.test(value), optional: true },
+];
+
+const strengthLabels = ["Very weak", "Weak", "Okay", "Good", "Strong"];
 
 const Signup = () => {
   const { setSessionUser } = useAuth();
@@ -39,10 +54,22 @@ const Signup = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  const password = watch("password") || "";
+  const strength = useMemo(() => {
+    const passed = passwordRules.filter((rule) => rule.test(password)).length;
+    const score = Math.min(4, Math.max(0, passed - 1));
+    return {
+      score,
+      label: password ? strengthLabels[score] : "Start typing",
+      percent: password ? Math.max(12, ((score + 1) / 5) * 100) : 0,
+    };
+  }, [password]);
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
@@ -107,7 +134,7 @@ const Signup = () => {
             to="/"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            â† {t("app.backHome")}
+            ← {t("app.backHome")}
           </Link>
           <h1 className="mt-6 font-display text-3xl font-bold text-foreground">
             {t("auth.signupTitle")}
@@ -131,6 +158,7 @@ const Signup = () => {
               <Label htmlFor="name">{t("auth.fullName")}</Label>
               <Input
                 id="name"
+                autoComplete="name"
                 {...register("name")}
                 className="mt-1.5"
                 placeholder="Your name"
@@ -146,6 +174,7 @@ const Signup = () => {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 {...register("email")}
                 className="mt-1.5"
                 placeholder="you@example.com"
@@ -161,10 +190,33 @@ const Signup = () => {
               <Input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 {...register("password")}
                 className="mt-1.5"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
               />
+              <div className="mt-3 rounded-2xl border border-border/70 bg-background/70 p-3">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-muted-foreground">Password strength</span>
+                  <span className={strength.score >= 3 ? "text-primary" : "text-muted-foreground"}>{strength.label}</span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={`h-full rounded-full transition-all ${strength.score >= 3 ? "bg-primary" : strength.score >= 2 ? "bg-secondary" : "bg-destructive"}`}
+                    style={{ width: `${strength.percent}%` }}
+                  />
+                </div>
+                <div className="mt-3 grid gap-1.5 text-xs">
+                  {passwordRules.map((rule) => {
+                    const passed = rule.test(password);
+                    return (
+                      <p key={rule.label} className={passed ? "text-primary" : "text-muted-foreground"}>
+                        {passed ? "✓" : "○"} {rule.label}{rule.optional ? " (optional)" : ""}
+                      </p>
+                    );
+                  })}
+                </div>
+              </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-destructive">
                   {errors.password.message}
@@ -178,9 +230,10 @@ const Signup = () => {
               <Input
                 id="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 {...register("confirmPassword")}
                 className="mt-1.5"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
               />
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-destructive">
@@ -199,7 +252,7 @@ const Signup = () => {
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {t("auth.haveAccount")}{" "}
+            {t("auth.haveAccount")} {" "}
             <Link
               to="/login"
               className="font-medium text-primary hover:underline"
@@ -214,5 +267,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-

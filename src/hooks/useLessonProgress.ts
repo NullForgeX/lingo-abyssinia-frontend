@@ -22,7 +22,7 @@ const writeCachedProgress = (userId: string, lessons: string[]) => {
 };
 
 export function useLessonProgress() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [completedLessons, setCompleted] = useState<string[]>([]);
 
   useEffect(() => {
@@ -79,9 +79,18 @@ export function useLessonProgress() {
     async (lessonId: string, xpEarned = 0) => {
       if (!user) return;
 
-      const nextCompleted = Array.from(new Set([...readCachedProgress(user.id), lessonId]));
+      const previousCompleted = readCachedProgress(user.id);
+      const alreadyCompleted = previousCompleted.includes(lessonId);
+      const nextCompleted = Array.from(new Set([...previousCompleted, lessonId]));
       writeCachedProgress(user.id, nextCompleted);
       setCompleted(nextCompleted);
+
+      if (!alreadyCompleted) {
+        await updateUser({
+          streak: Math.max(1, (user.streak || 0) + 1),
+          gems: (user.gems || 0) + Math.max(1, Math.round(xpEarned / 5)),
+        });
+      }
 
       const { error } = await supabase.from("lesson_progress").upsert(
         {
@@ -95,7 +104,7 @@ export function useLessonProgress() {
 
       if (error) console.error("Failed to save lesson progress", error);
     },
-    [user],
+    [user, updateUser],
   );
 
   return { completedLessons, markComplete };

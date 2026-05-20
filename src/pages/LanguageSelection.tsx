@@ -20,7 +20,7 @@ const languages = [
   },
   {
     key: "oromo" as const,
-    language: "Oromo",
+    language: "Afan Oromoo",
     greeting: "Nagaa",
     script: "O",
     description: "Most widely spoken language in Ethiopia with vibrant daily conversation usage.",

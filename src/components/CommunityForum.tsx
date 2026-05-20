@@ -36,7 +36,7 @@ const CommunityForum = () => {
   const [search, setSearch] = useState("");
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [postStatus, setPostStatus] = useState<"idle" | "posting" | "posted">("idle");
   const [replyingPostId, setReplyingPostId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -79,7 +79,7 @@ const CommunityForum = () => {
       return;
     }
 
-    setSubmitting(true);
+    setPostStatus("posting");
     try {
       const newPost = await createCommunityPost(user, {
         type: draftType,
@@ -91,11 +91,14 @@ const CommunityForum = () => {
       setDraftTitle("");
       setDraftBody("");
       setDraftType("question");
-      await loadPosts();
+      loadPosts().catch((err) => {
+        console.error("Posted, but could not refresh community posts", err);
+      });
+      setPostStatus("posted");
+      window.setTimeout(() => setPostStatus("idle"), 1800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create post.");
     } finally {
-      setSubmitting(false);
     }
   };
 
@@ -225,7 +228,7 @@ const CommunityForum = () => {
               </label>
             </div>
             <Textarea value={draftBody} onChange={(e) => setDraftBody(e.target.value)} placeholder="Write your question or study tip..." className="min-h-[110px] resize-none" />
-            <Button onClick={handleSubmit} disabled={submitting} className="gap-2 rounded-2xl"><Send className="h-4 w-4" /> {submitting ? "Posting..." : "Post to community"}</Button>
+            <Button onClick={handleSubmit} disabled={postStatus === "posting"} className="gap-2 rounded-2xl"><Send className="h-4 w-4" /> {postStatus === "posting" ? "Posting..." : postStatus === "posted" ? "Posted" : "Post to community"}</Button>
           </CardContent>
         </Card>
 
