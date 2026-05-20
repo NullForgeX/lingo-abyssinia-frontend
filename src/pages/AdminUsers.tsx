@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { AdminUserActivity, getAdminUsersActivity, pushAdminAuditLog, saveAdminUsersActivity } from "@/data/adminStore";
+import { useEffect, useMemo, useState } from "react";
+import { AdminUserActivity, getAdminUsersActivity, pushAdminAuditLog, updateAdminUserRole } from "@/data/adminStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,10 +7,28 @@ import { Button } from "@/components/ui/button";
 const PAGE_SIZE = 8;
 
 const AdminUsers = () => {
-  const [users, setUsers] = useState<AdminUserActivity[]>(getAdminUsersActivity());
+  const [users, setUsers] = useState<AdminUserActivity[]>([]);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "learner" | "admin">("all");
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        setUsers(await getAdminUsersActivity());
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Could not load users.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
 
   const filtered = useMemo(() => {
     return users
@@ -22,18 +40,22 @@ const AdminUsers = () => {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const updateRole = (id: string, role: "learner" | "admin") => {
-    const next = users.map((u) => (u.id === id ? { ...u, role } : u));
-    setUsers(next);
-    saveAdminUsersActivity(next);
-    const target = next.find((u) => u.id === id);
-    pushAdminAuditLog({ actor: "Admin", action: `Changed role to ${role}`, target: target?.email || id });
+  const updateRole = async (id: string, role: "learner" | "admin") => {
+    const target = users.find((u) => u.id === id);
+    try {
+      await updateAdminUserRole(id, role);
+      await pushAdminAuditLog({ actor: "Admin", action: `Changed role to ${role}`, target: target?.email || id });
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update role.");
+    }
   };
 
   return (
     <div>
       <h1 className="font-display text-2xl font-bold md:text-3xl">User Activity & Roles</h1>
       <p className="mt-2 text-sm text-muted-foreground">Monitor learners, filter activity, and manage roles safely.</p>
+      {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
 
       <div className="mt-6 rounded-2xl border border-border bg-card/95 p-5">
         <div className="mb-4 grid gap-3 md:grid-cols-3">
@@ -46,7 +68,9 @@ const AdminUsers = () => {
           <div className="text-sm text-muted-foreground flex items-center">{filtered.length} results</div>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Loading users...</div>
+        ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No users match current filters.</div>
         ) : (
           <>

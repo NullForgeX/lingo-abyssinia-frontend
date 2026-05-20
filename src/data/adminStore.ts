@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 export type AdminLesson = {
   id: string;
   title: string;
@@ -34,92 +36,144 @@ export type ModerationReport = {
   createdAt: string;
 };
 
-const LESSONS_KEY = "lingo_admin_lessons";
-const USERS_KEY = "lingo_admin_users";
-const AUDIT_KEY = "lingo_admin_audit";
-const REPORTS_KEY = "lingo_admin_reports";
-
-const defaultLessons: AdminLesson[] = [
-  { id: "les-101", title: "Amharic Basics: Greetings", language: "amharic", level: "beginner", status: "published", updatedAt: new Date().toISOString() },
-  { id: "les-201", title: "Oromo Listening: Daily Conversation", language: "oromo", level: "intermediate", status: "draft", updatedAt: new Date().toISOString() },
-  { id: "les-301", title: "Tigrinya Grammar Patterns", language: "tigrinya", level: "advanced", status: "published", updatedAt: new Date().toISOString() },
-];
-
-const defaultAudit: AdminAuditLog[] = [
-  { id: "a-1", actor: "System", action: "Seeded admin data", target: "Initial setup", timestamp: new Date().toISOString() },
-];
-
-const defaultReports: ModerationReport[] = [
-  { id: "r-1", reporter: "Rahel", reason: "Spam reply", targetPost: "How do you remember characters?", status: "open", createdAt: "2026-05-09" },
-  { id: "r-2", reporter: "Abel", reason: "Off-topic", targetPost: "Marketplace links", status: "resolved", createdAt: "2026-05-08" },
-];
-
-function readJSON<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) {
-      localStorage.setItem(key, JSON.stringify(fallback));
-      return fallback;
-    }
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeJSON<T>(key: string, value: T) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-export const getAdminLessons = (): AdminLesson[] => readJSON(LESSONS_KEY, defaultLessons);
-export const saveAdminLessons = (lessons: AdminLesson[]) => writeJSON(LESSONS_KEY, lessons);
-
-export const getAdminUsersActivity = (): AdminUserActivity[] => {
-  const base: AdminUserActivity[] = readJSON(USERS_KEY, [
-    { id: "u-1", name: "Abel", email: "abel@example.com", role: "learner", lessonsCompleted: 14, streak: 5, lastActive: "2026-05-08" },
-    { id: "u-2", name: "Rahel", email: "rahel@example.com", role: "learner", lessonsCompleted: 22, streak: 11, lastActive: "2026-05-09" },
-    { id: "u-3", name: "System Admin", email: "admin@lingoabyssinia.com", role: "admin", lessonsCompleted: 0, streak: 0, lastActive: "2026-05-09" },
-  ]);
-
-  const signedInRaw = localStorage.getItem("lingo_user");
-  const signedInUser = signedInRaw ? JSON.parse(signedInRaw) : null;
-
-  if (signedInUser?.email) {
-    const exists = base.some((u) => u.email === signedInUser.email);
-    if (!exists) {
-      base.unshift({
-        id: signedInUser.id ?? `u-${Date.now()}`,
-        name: signedInUser.name ?? "Current User",
-        email: signedInUser.email,
-        role: signedInUser.role ?? "learner",
-        lessonsCompleted: 0,
-        streak: signedInUser.streak ?? 0,
-        lastActive: new Date().toISOString().slice(0, 10),
-      });
-      writeJSON(USERS_KEY, base);
-    }
-  }
-
-  return base;
+type LessonRow = {
+  id: string;
+  title: string;
+  language: AdminLesson["language"];
+  level: AdminLesson["level"];
+  status: AdminLesson["status"];
+  updated_at: string;
 };
 
-export const saveAdminUsersActivity = (users: AdminUserActivity[]) => writeJSON(USERS_KEY, users);
+const mapLesson = (row: LessonRow): AdminLesson => ({
+  id: row.id,
+  title: row.title,
+  language: row.language,
+  level: row.level,
+  status: row.status,
+  updatedAt: row.updated_at,
+});
 
-export const getAdminAuditLogs = (): AdminAuditLog[] => readJSON(AUDIT_KEY, defaultAudit);
+export const getAdminLessons = async (): Promise<AdminLesson[]> => {
+  const { data, error } = await supabase
+    .from("lessons")
+    .select("id,title,language,level,status,updated_at")
+    .order("updated_at", { ascending: false });
 
-export const pushAdminAuditLog = (entry: Omit<AdminAuditLog, "id" | "timestamp">) => {
-  const logs = getAdminAuditLogs();
-  const next: AdminAuditLog[] = [
-    {
-      id: `a-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      ...entry,
-    },
-    ...logs,
-  ].slice(0, 200);
-  writeJSON(AUDIT_KEY, next);
+  if (error) throw error;
+  return ((data || []) as LessonRow[]).map(mapLesson);
 };
 
-export const getModerationReports = (): ModerationReport[] => readJSON(REPORTS_KEY, defaultReports);
+export const upsertAdminLesson = async (
+  lesson: Omit<AdminLesson, "id" | "updatedAt"> & { id?: string },
+): Promise<AdminLesson> => {
+  const payload: Record<string, unknown> = {
+    title: lesson.title,
+    language: lesson.language,
+    level: lesson.level,
+    status: lesson.status,
+  };
 
-export const saveModerationReports = (reports: ModerationReport[]) => writeJSON(REPORTS_KEY, reports);
+  if (lesson.id) payload.id = lesson.id;
+
+  const { data, error } = await supabase
+    .from("lessons")
+    .upsert(payload)
+    .select("id,title,language,level,status,updated_at")
+    .single();
+
+  if (error) throw error;
+  return mapLesson(data as LessonRow);
+};
+
+export const deleteAdminLesson = async (id: string) => {
+  const { error } = await supabase.from("lessons").delete().eq("id", id);
+  if (error) throw error;
+};
+
+export const getAdminUsersActivity = async (): Promise<AdminUserActivity[]> => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id,name,email,role,streak,updated_at,lesson_progress(lesson_id)")
+    .order("updated_at", { ascending: false });
+
+  if (error) throw error;
+
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    role: row.role,
+    lessonsCompleted: row.lesson_progress?.length || 0,
+    streak: row.streak || 0,
+    lastActive: row.updated_at,
+  }));
+};
+
+export const updateAdminUserRole = async (
+  id: string,
+  role: AdminUserActivity["role"],
+) => {
+  const { error } = await supabase.from("profiles").update({ role }).eq("id", id);
+  if (error) throw error;
+};
+
+export const getAdminAuditLogs = async (): Promise<AdminAuditLog[]> => {
+  const { data, error } = await supabase
+    .from("admin_audit_logs")
+    .select("id,actor,action,target,created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (error) throw error;
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    actor: row.actor,
+    action: row.action,
+    target: row.target,
+    timestamp: row.created_at,
+  }));
+};
+
+export const pushAdminAuditLog = async (
+  entry: Omit<AdminAuditLog, "id" | "timestamp">,
+) => {
+  const { data: userData } = await supabase.auth.getUser();
+  const { error } = await supabase.from("admin_audit_logs").insert({
+    actor_id: userData.user?.id,
+    actor: entry.actor,
+    action: entry.action,
+    target: entry.target,
+  });
+
+  if (error) throw error;
+};
+
+export const getModerationReports = async (): Promise<ModerationReport[]> => {
+  const { data, error } = await supabase
+    .from("moderation_reports")
+    .select("id,reason,status,created_at,profiles(name),community_posts(title)")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    reporter: row.profiles?.name || "Learner",
+    reason: row.reason,
+    targetPost: row.community_posts?.title || "Community post",
+    status: row.status,
+    createdAt: row.created_at,
+  }));
+};
+
+export const saveModerationReportStatus = async (
+  id: string,
+  status: ModerationReport["status"],
+) => {
+  const { error } = await supabase
+    .from("moderation_reports")
+    .update({ status, resolved_at: status === "resolved" ? new Date().toISOString() : null })
+    .eq("id", id);
+
+  if (error) throw error;
+};

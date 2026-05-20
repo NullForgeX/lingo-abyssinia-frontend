@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { mockResetPassword } from "@/api/mockAuth";
+import { updatePassword } from "@/api/supabaseAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,10 +21,9 @@ const schema = z
 type FormData = z.infer<typeof schema>;
 
 const ResetPassword = () => {
-  const [params] = useSearchParams();
-  const token = useMemo(() => params.get("token") || "demo-token", [params]);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [message, setMessage] = useState("");
 
   const {
     register,
@@ -36,9 +35,12 @@ const ResetPassword = () => {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
+    setMessage("");
     try {
-      await mockResetPassword(token, data.password);
+      await updatePassword(data.password);
       setDone(true);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Password reset failed.");
     } finally {
       setLoading(false);
     }
@@ -54,6 +56,11 @@ const ResetPassword = () => {
 
         {!done ? (
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+            {message && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {message}
+              </p>
+            )}
             <div>
               <Label htmlFor="password">New Password</Label>
               <Input id="password" type="password" {...register("password")} className="mt-1.5" />

@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLesson } from "@/data/courseContent";
+import { getLesson, getNextLesson } from "@/data/courseContent";
 import { Progress } from "@/components/ui/progress";
 import MultipleChoice from "@/components/exercises/MultipleChoice";
 import TranslationExercise from "@/components/exercises/TranslationExercise";
@@ -21,6 +21,11 @@ const LessonPlayer = () => {
 
   const lesson = useMemo(
     () => getLesson(user?.selectedLanguage || "amharic", lessonId || ""),
+    [user?.selectedLanguage, lessonId],
+  );
+
+  const nextLesson = useMemo(
+    () => getNextLesson(user?.selectedLanguage || "amharic", lessonId || ""),
     [user?.selectedLanguage, lessonId],
   );
 
@@ -58,6 +63,9 @@ const LessonPlayer = () => {
             correctAnswers: correctCount,
             xpEarned: 0,
             passed: false,
+            lessonId: lesson.id,
+            nextLessonId: nextLesson?.id,
+            nextLessonTitle: nextLesson?.title,
           },
         });
       }, 500);
@@ -78,6 +86,8 @@ const LessonPlayer = () => {
             xpEarned: xp,
             passed: accuracy >= 0.5,
             lessonId: lesson.id,
+            nextLessonId: nextLesson?.id,
+            nextLessonTitle: nextLesson?.title,
           },
         });
       } else {
@@ -182,3 +192,4 @@ const LessonPlayer = () => {
 };
 
 export default LessonPlayer;
+

@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { AdminLesson, getAdminLessons, pushAdminAuditLog, saveAdminLessons } from "@/data/adminStore";
+import { useEffect, useMemo, useState } from "react";
+import { AdminLesson, deleteAdminLesson, getAdminLessons, pushAdminAuditLog, upsertAdminLesson } from "@/data/adminStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,7 +24,7 @@ const emptyForm = {
 };
 
 const AdminLessons = () => {
-  const [lessons, setLessons] = useState<AdminLesson[]>(getAdminLessons());
+  const [lessons, setLessons] = useState<AdminLesson[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -32,6 +32,24 @@ const AdminLessons = () => {
   const [filterStatus, setFilterStatus] = useState<"all" | AdminLesson["status"]>("all");
   const [page, setPage] = useState(1);
   const [toDelete, setToDelete] = useState<AdminLesson | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadLessons = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      setLessons(await getAdminLessons());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load lessons.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLessons();
+  }, []);
 
   const filtered = useMemo(() => {
     return [...lessons]
@@ -44,31 +62,18 @@ const AdminLessons = () => {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const upsert = () => {
+  const upsert = async () => {
     if (!form.title.trim()) return;
 
-    let next: AdminLesson[];
-    if (editingId) {
-      next = lessons.map((l) =>
-        l.id === editingId ? { ...l, ...form, updatedAt: new Date().toISOString() } : l,
-      );
-      pushAdminAuditLog({ actor: "Admin", action: "Updated lesson", target: form.title.trim() });
-    } else {
-      next = [
-        {
-          id: `les-${Date.now()}`,
-          ...form,
-          updatedAt: new Date().toISOString(),
-        },
-        ...lessons,
-      ];
-      pushAdminAuditLog({ actor: "Admin", action: "Created lesson", target: form.title.trim() });
+    try {
+      const saved = await upsertAdminLesson({ id: editingId || undefined, ...form });
+      await pushAdminAuditLog({ actor: "Admin", action: editingId ? "Updated lesson" : "Created lesson", target: form.title.trim() });
+      setLessons((prev) => editingId ? prev.map((l) => l.id === editingId ? saved : l) : [saved, ...prev]);
+      setForm(emptyForm);
+      setEditingId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save lesson.");
     }
-
-    setLessons(next);
-    saveAdminLessons(next);
-    setForm(emptyForm);
-    setEditingId(null);
   };
 
   const editLesson = (lesson: AdminLesson) => {
@@ -81,19 +86,23 @@ const AdminLessons = () => {
     });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!toDelete) return;
-    const next = lessons.filter((l) => l.id !== toDelete.id);
-    setLessons(next);
-    saveAdminLessons(next);
-    pushAdminAuditLog({ actor: "Admin", action: "Deleted lesson", target: toDelete.title });
-    setToDelete(null);
+    try {
+      await deleteAdminLesson(toDelete.id);
+      await pushAdminAuditLog({ actor: "Admin", action: "Deleted lesson", target: toDelete.title });
+      setLessons((prev) => prev.filter((l) => l.id !== toDelete.id));
+      setToDelete(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not delete lesson.");
+    }
   };
 
   return (
     <div>
       <h1 className="font-display text-2xl font-bold md:text-3xl">Lesson Management (CRUD)</h1>
       <p className="mt-2 text-sm text-muted-foreground">Create, edit, publish, delete, and filter lessons with paging.</p>
+      {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
 
       <div className="mt-6 rounded-2xl border border-border bg-card/95 p-5">
         <h2 className="font-semibold">{editingId ? "Edit lesson" : "Create lesson"}</h2>
@@ -156,7 +165,9 @@ const AdminLessons = () => {
           <div className="text-sm text-muted-foreground flex items-center">{filtered.length} results</div>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Loading lessons...</div>
+        ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No lessons match current filters.</div>
         ) : (
           <>

@@ -1,10 +1,11 @@
-export interface Exercise {
+﻿export interface Exercise {
   id: string;
   type: "multiple-choice" | "translation" | "audio";
   question: string;
   audioText?: string;
   options?: string[];
   correctAnswer: string;
+  acceptedAnswers?: string[];
   image?: string;
 }
 
@@ -30,6 +31,12 @@ export interface Course {
 
 type Lang = Course["language"];
 
+type TopicCard = {
+  english: string;
+  target: string;
+  category: string;
+};
+
 type Lexicon = {
   greeting: string;
   thanks: string;
@@ -45,11 +52,11 @@ type Lexicon = {
 
 const lexicons: Record<Lang, Lexicon> = {
   amharic: {
-    greeting: "Selam",
-    thanks: "Ameseginalehu",
-    goodbye: "Dehna hun",
-    yes: "Awo",
-    no: "Aydellem",
+    greeting: "selam",
+    thanks: "ameseginalehu",
+    goodbye: "dehna hun",
+    yes: "awo",
+    no: "aydellem",
     numbers: ["and", "hulet", "sost", "arat", "amist", "sidist", "sebat", "siment", "zetegn", "asir"],
     people: ["enat", "abat", "wendim", "ehet", "memhir", "temari"],
     places: ["bet", "suq", "timhirt bet", "addis", "mender"],
@@ -57,23 +64,23 @@ const lexicons: Record<Lang, Lexicon> = {
     verbs: ["hed", "metta", "bel", "teyik", "moker"],
   },
   oromo: {
-    greeting: "Nagaa",
-    thanks: "Galatoomaa",
-    goodbye: "Nagaatti",
-    yes: "Eeyyee",
-    no: "Lakki",
+    greeting: "nagaa",
+    thanks: "galatoomaa",
+    goodbye: "nagaatti",
+    yes: "eeyyee",
+    no: "lakki",
     numbers: ["tokko", "lama", "sadii", "afur", "shan", "jaha", "torba", "saddeet", "sagal", "kudhan"],
     people: ["haadha", "abba", "obboleessa", "obboleettii", "barsiisaa", "barataa"],
     places: ["mana", "gabaa", "mana barumsaa", "magaalaa", "baadiyyaa"],
-    foods: ["buddeena", "ittoo", "buna", "annaan", "foon"],
+    foods: ["buddeena", "ittoo", "buna", "daabboo", "foon"],
     verbs: ["deemi", "kottu", "nyaadhu", "gaafadhu", "shaakali"],
   },
   tigrinya: {
-    greeting: "Selam",
-    thanks: "Yekenyeley",
-    goodbye: "Dehan kun",
-    yes: "Ee",
-    no: "Aykonen",
+    greeting: "selam",
+    thanks: "yekenyeley",
+    goodbye: "dehan kun",
+    yes: "ee",
+    no: "aykonen",
     numbers: ["hade", "kilte", "seleste", "arbaete", "hamushte", "shudushte", "shewate", "shimente", "tishate", "aserte"],
     people: ["ade", "ab", "haw", "hafti", "memhir", "temhari"],
     places: ["geza", "suuq", "bet timhrti", "asmera", "qushet"],
@@ -83,109 +90,146 @@ const lexicons: Record<Lang, Lexicon> = {
 };
 
 const unitBlueprints: Array<{ title: string; description: string; lessonTitles: string[] }> = [
-  {
-    title: "Foundations",
-    description: "Greetings, polite phrases, and survival basics.",
-    lessonTitles: ["Hello and Goodbye", "Polite Words", "Introducing Yourself", "Simple Questions", "Mini Conversation"],
-  },
-  {
-    title: "Numbers and Time",
-    description: "Count, tell time, and discuss schedules.",
-    lessonTitles: ["Numbers 1-10", "Numbers 11-100", "Days of Week", "Telling Time", "Daily Schedule"],
-  },
-  {
-    title: "People and Family",
-    description: "Talk about family, friends, and roles.",
-    lessonTitles: ["Family Members", "Describing People", "Professions", "Age and Birthday", "Social Introductions"],
-  },
-  {
-    title: "Home and Places",
-    description: "Navigate locations and home vocabulary.",
-    lessonTitles: ["Home Vocabulary", "Directions", "Neighborhood", "At School", "City vs Village"],
-  },
-  {
-    title: "Food and Market",
-    description: "Order food and shop with confidence.",
-    lessonTitles: ["Common Foods", "At the Market", "Ordering Meals", "Quantities and Prices", "Food Preferences"],
-  },
-  {
-    title: "Actions and Verbs",
-    description: "Core verbs and sentence building.",
-    lessonTitles: ["Common Verbs", "Present Actions", "Past Actions", "Future Plans", "Mixed Practice"],
-  },
-  {
-    title: "Travel and Transport",
-    description: "Move around and ask travel questions.",
-    lessonTitles: ["Transportation Words", "Buying Tickets", "Asking Routes", "At the Station", "Trip Dialogues"],
-  },
-  {
-    title: "Health and Wellbeing",
-    description: "Explain basic health needs and feelings.",
-    lessonTitles: ["Body and Feelings", "At the Clinic", "Describing Symptoms", "Advice and Help", "Health Check Dialogue"],
-  },
-  {
-    title: "Work and Study",
-    description: "Use language in school and workplace contexts.",
-    lessonTitles: ["Classroom Language", "Office Expressions", "Tasks and Deadlines", "Meetings and Notes", "Formal Conversation"],
-  },
-  {
-    title: "Culture and Community",
-    description: "Learn language tied to culture and social life.",
-    lessonTitles: ["Holidays", "Community Events", "Traditions", "Music and Stories", "Cultural Dialogue"],
-  },
-  {
-    title: "Intermediate Fluency",
-    description: "Longer comprehension and response drills.",
-    lessonTitles: ["Listening Practice", "Reading Short Texts", "Responding Naturally", "Error Correction", "Fluency Challenge"],
-  },
-  {
-    title: "Mastery Path",
-    description: "Advanced mixed practice and review.",
-    lessonTitles: ["Advanced Vocabulary", "Complex Sentences", "Scenario Simulation", "Fast Review", "Final Mastery Test"],
-  },
+  { title: "Foundations", description: "Greetings, polite phrases, and survival basics.", lessonTitles: ["Hello and Goodbye", "Polite Words", "Introducing Yourself", "Simple Questions", "Mini Conversation"] },
+  { title: "Numbers and Time", description: "Count, tell time, and discuss schedules.", lessonTitles: ["Numbers 1-10", "Numbers 11-100", "Days of Week", "Telling Time", "Daily Schedule"] },
+  { title: "People and Family", description: "Talk about family, friends, and roles.", lessonTitles: ["Family Members", "Describing People", "Professions", "Age and Birthday", "Social Introductions"] },
+  { title: "Home and Places", description: "Navigate locations and home vocabulary.", lessonTitles: ["Home Vocabulary", "Directions", "Neighborhood", "At School", "City vs Village"] },
+  { title: "Food and Market", description: "Order food and shop with confidence.", lessonTitles: ["Common Foods", "At the Market", "Ordering Meals", "Quantities and Prices", "Food Preferences"] },
+  { title: "Actions and Verbs", description: "Core verbs and sentence building.", lessonTitles: ["Common Verbs", "Present Actions", "Past Actions", "Future Plans", "Mixed Practice"] },
+  { title: "Travel and Transport", description: "Move around and ask travel questions.", lessonTitles: ["Transportation Words", "Buying Tickets", "Asking Routes", "At the Station", "Trip Dialogues"] },
+  { title: "Health and Wellbeing", description: "Explain basic health needs and feelings.", lessonTitles: ["Body and Feelings", "At the Clinic", "Describing Symptoms", "Advice and Help", "Health Check Dialogue"] },
+  { title: "Work and Study", description: "Use language in school and workplace contexts.", lessonTitles: ["Classroom Language", "Office Expressions", "Tasks and Deadlines", "Meetings and Notes", "Formal Conversation"] },
+  { title: "Culture and Community", description: "Learn language tied to culture and social life.", lessonTitles: ["Holidays", "Community Events", "Traditions", "Music and Stories", "Cultural Dialogue"] },
+  { title: "Intermediate Fluency", description: "Longer comprehension and response drills.", lessonTitles: ["Listening Practice", "Reading Short Texts", "Responding Naturally", "Error Correction", "Fluency Challenge"] },
+  { title: "Mastery Path", description: "Advanced mixed practice and review.", lessonTitles: ["Advanced Vocabulary", "Complex Sentences", "Scenario Simulation", "Fast Review", "Final Mastery Test"] },
 ];
 
+const topicEnglish: Record<string, string[]> = {
+  Foundations: ["hello", "thank you", "goodbye", "yes", "no"],
+  "Numbers and Time": ["one", "two", "three", "four", "five"],
+  "People and Family": ["mother", "father", "brother", "sister", "teacher"],
+  "Home and Places": ["home", "market", "school", "city", "village"],
+  "Food and Market": ["injera", "stew", "coffee", "bread", "meat"],
+  "Actions and Verbs": ["go", "come", "eat", "ask", "practice"],
+  "Travel and Transport": ["bus", "ticket", "road", "station", "trip"],
+  "Health and Wellbeing": ["head", "doctor", "pain", "help", "rest"],
+  "Work and Study": ["book", "office", "task", "meeting", "note"],
+  "Culture and Community": ["holiday", "community", "tradition", "song", "story"],
+  "Intermediate Fluency": ["listen", "read", "reply", "correct", "speak"],
+  "Mastery Path": ["advanced", "sentence", "scenario", "review", "mastery"],
+};
+
+const topicTargets: Record<Lang, Record<string, string[]>> = {
+  amharic: {
+    Foundations: ["selam", "ameseginalehu", "dehna hun", "awo", "aydellem"],
+    "Numbers and Time": ["and", "hulet", "sost", "arat", "amist"],
+    "People and Family": ["enat", "abat", "wendim", "ehet", "memhir"],
+    "Home and Places": ["bet", "suq", "timhirt bet", "addis", "mender"],
+    "Food and Market": ["injera", "shiro", "buna", "dabo", "wot"],
+    "Actions and Verbs": ["hed", "metta", "bel", "teyik", "moker"],
+    "Travel and Transport": ["awtobus", "tiketi", "menged", "maferia", "guzo"],
+    "Health and Wellbeing": ["ras", "hakim", "himem", "erdagn", "arif"],
+    "Work and Study": ["metsaf", "biro", "sira", "sibseba", "mastawesha"],
+    "Culture and Community": ["baal", "mahbereseb", "bahil", "zefen", "teret"],
+    "Intermediate Fluency": ["adamet", "anbeb", "melis", "astekakel", "tenager"],
+    "Mastery Path": ["keftegna", "sentence", "gidaj", "review", "mastery"],
+  },
+  oromo: {
+    Foundations: ["nagaa", "galatoomaa", "nagaatti", "eeyyee", "lakki"],
+    "Numbers and Time": ["tokko", "lama", "sadii", "afur", "shan"],
+    "People and Family": ["haadha", "abba", "obboleessa", "obboleettii", "barsiisaa"],
+    "Home and Places": ["mana", "gabaa", "mana barumsaa", "magaalaa", "baadiyyaa"],
+    "Food and Market": ["buddeena", "ittoo", "buna", "daabboo", "foon"],
+    "Actions and Verbs": ["deemi", "kottu", "nyaadhu", "gaafadhu", "shaakali"],
+    "Travel and Transport": ["atoobisii", "tikeetii", "karaa", "buufata", "imala"],
+    "Health and Wellbeing": ["mataa", "doktora", "dhukkuba", "gargaarsa", "boqonnaa"],
+    "Work and Study": ["kitaaba", "waajjira", "hojii", "walgahii", "yaadannoo"],
+    "Culture and Community": ["ayyaana", "hawaasa", "aadaa", "sirba", "seenaa"],
+    "Intermediate Fluency": ["dhaggeeffadhu", "dubbisi", "deebisi", "sirreessi", "dubbadhu"],
+    "Mastery Path": ["ol aanaa", "hima", "haala", "irra deebi", "gooftummaa"],
+  },
+  tigrinya: {
+    Foundations: ["selam", "yekenyeley", "dehan kun", "ee", "aykonen"],
+    "Numbers and Time": ["hade", "kilte", "seleste", "arbaete", "hamushte"],
+    "People and Family": ["ade", "ab", "haw", "hafti", "memhir"],
+    "Home and Places": ["geza", "suuq", "bet timhrti", "asmera", "qushet"],
+    "Food and Market": ["injera", "shiro", "buna", "himbasha", "tsahli"],
+    "Actions and Verbs": ["deyeb", "nsi", "bela", "hato", "moker"],
+    "Travel and Transport": ["awtobus", "ticket", "mengedi", "station", "guzo"],
+    "Health and Wellbeing": ["reesi", "doktor", "himam", "hገዝ", "arif"],
+    "Work and Study": ["metsihaf", "biro", "sira", "meeting", "not"],
+    "Culture and Community": ["baal", "hizbi", "bahli", "zefen", "tarik"],
+    "Intermediate Fluency": ["semae", "anbebe", "melisi", "astakakil", "tezareb"],
+    "Mastery Path": ["advanced", "sentence", "scenario", "review", "mastery"],
+  },
+};
+
+const languageNames: Record<Lang, string> = {
+  amharic: "Amharic",
+  oromo: "Afan Oromoo",
+  tigrinya: "Tigrinya",
+};
+
 function pick<T>(arr: T[], seed: number): T {
-  return arr[seed % arr.length];
+  return arr[((seed % arr.length) + arr.length) % arr.length];
 }
 
-function makeExercises(language: Lang, lessonId: string, lessonTitle: string, seed: number): Exercise[] {
+function shuffleOptions<T>(arr: T[], seed: number): T[] {
+  return [...arr].sort((a, b) => {
+    const aScore = JSON.stringify(a).length * 17 + seed * 13 + String(a).charCodeAt(0);
+    const bScore = JSON.stringify(b).length * 17 + seed * 13 + String(b).charCodeAt(0);
+    return (aScore % 11) - (bScore % 11);
+  });
+}
+
+function getTopicCard(language: Lang, unitTitle: string, lessonIndex: number): TopicCard {
+  const english = topicEnglish[unitTitle][lessonIndex];
+  const target = topicTargets[language][unitTitle][lessonIndex];
+  return { english, target, category: unitTitle };
+}
+
+function makeExercises(language: Lang, unitTitle: string, lessonId: string, lessonTitle: string, lessonIndex: number, seed: number): Exercise[] {
   const lx = lexicons[language];
-  const n1 = pick(lx.numbers, seed);
-  const n2 = pick(lx.numbers, seed + 2);
-  const person = pick(lx.people, seed + 1);
-  const place = pick(lx.places, seed + 3);
-  const food = pick(lx.foods, seed + 4);
-  const verb = pick(lx.verbs, seed + 5);
+  const langName = languageNames[language];
+  const card = getTopicCard(language, unitTitle, lessonIndex);
+  const support = getTopicCard(language, unitTitle, (lessonIndex + 2) % 5);
+  const person = pick(lx.people, seed + lessonIndex);
+  const place = pick(lx.places, seed * 2 + lessonIndex);
+  const food = pick(lx.foods, seed * 3 + lessonIndex);
+  const verb = pick(lx.verbs, seed * 5 + lessonIndex);
+  const number = pick(lx.numbers, seed * 7 + lessonIndex);
+  const phrase = `${person} ${verb} ${place}`;
+  const uniquePrompt = `${langName} ${unitTitle}: ${lessonTitle}`;
 
   return [
     {
       id: `${lessonId}-e1`,
       type: "multiple-choice",
-      question: `In ${lessonTitle}, pick the polite phrase used most for gratitude in ${language}.`,
-      options: [lx.thanks, lx.greeting, lx.goodbye, lx.no],
-      correctAnswer: lx.thanks,
+      question: `${uniquePrompt}. Which ${langName} word means "${card.english}"?`,
+      options: shuffleOptions([card.target, support.target, food, number], seed),
+      correctAnswer: card.target,
     },
     {
       id: `${lessonId}-e2`,
       type: "translation",
-      question: `Translate this target word to ${language}: "yes"`,
-      correctAnswer: lx.yes,
+      question: `${uniquePrompt}. Type the ${langName} word for "${support.english}".`,
+      correctAnswer: support.target,
+      acceptedAnswers: [support.target, support.target.toLowerCase()],
     },
     {
       id: `${lessonId}-e3`,
       type: "audio",
-      question: `Listen and choose the best meaning for "${person} ${verb}" in context.`,
-      audioText: `${person} ${verb}`,
-      options: ["person + action", "food + action", "place + time", "number + greeting"],
-      correctAnswer: "person + action",
+      question: `${uniquePrompt}. Listen and choose the phrase you heard.`,
+      audioText: phrase,
+      options: shuffleOptions([phrase, `${food} ${verb} ${number}`, `${place} ${lx.goodbye}`, `${lx.greeting} ${support.target}`], seed + 3),
+      correctAnswer: phrase,
     },
     {
       id: `${lessonId}-e4`,
       type: "multiple-choice",
-      question: `Which option is a valid ${language} study phrase from this lesson set?`,
-      options: [`${lx.greeting} ${n1}`, `${food} ${place}`, `${n2} ${lx.goodbye}`, `${lx.no} ${lx.thanks}`],
-      correctAnswer: `${lx.greeting} ${n1}`,
+      question: `${uniquePrompt}. Choose the natural practice phrase for this lesson topic.`,
+      options: shuffleOptions([`${card.target} ${verb}`, `${lx.no} ${food}`, `${number} ${lx.thanks}`, `${place} ${person}`], seed + 9),
+      correctAnswer: `${card.target} ${verb}`,
     },
   ];
 }
@@ -196,23 +240,18 @@ function makeCourse(language: Lang, prefix: string): Course {
 
     const lessons: Lesson[] = unit.lessonTitles.map((title, lessonIndex) => {
       const lessonId = `${unitId}-l${lessonIndex + 1}`;
-      const seed = unitIndex * 10 + lessonIndex;
+      const seed = unitIndex * 17 + lessonIndex * 7 + prefix.charCodeAt(0);
 
       return {
         id: lessonId,
         title,
         description: `${unit.description} Focus: ${title}.`,
         xpReward: 12 + (lessonIndex % 4) * 3 + Math.floor(unitIndex / 3) * 2,
-        exercises: makeExercises(language, lessonId, title, seed),
+        exercises: makeExercises(language, unit.title, lessonId, title, lessonIndex, seed),
       };
     });
 
-    return {
-      id: unitId,
-      title: unit.title,
-      description: unit.description,
-      lessons,
-    };
+    return { id: unitId, title: unit.title, description: unit.description, lessons };
   });
 
   return { language, units };
@@ -239,4 +278,10 @@ export function getLesson(language: string, lessonId: string): Lesson | undefine
     if (lesson) return lesson;
   }
   return undefined;
+}
+
+export function getNextLesson(language: string, lessonId: string): Lesson | undefined {
+  const lessons = getCourse(language).units.flatMap((unit) => unit.lessons);
+  const currentIndex = lessons.findIndex((lesson) => lesson.id === lessonId);
+  return currentIndex >= 0 ? lessons[currentIndex + 1] : undefined;
 }

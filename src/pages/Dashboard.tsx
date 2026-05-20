@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
@@ -24,7 +24,9 @@ const Dashboard = () => {
   const course = getCourse(user?.selectedLanguage || "amharic");
   const allLessons = course.units.flatMap((unit) => unit.lessons);
   const totalLessons = allLessons.length;
-  const completedCount = completedLessons.length;
+  const courseLessonIds = new Set(allLessons.map((lesson) => lesson.id));
+  const completedForCourse = completedLessons.filter((lessonId) => courseLessonIds.has(lessonId));
+  const completedCount = completedForCourse.length;
   const completion = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   const nextLesson = allLessons.find((lesson) => !completedLessons.includes(lesson.id));
 
@@ -143,3 +145,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

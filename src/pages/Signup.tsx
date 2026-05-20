@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
-import { mockSignup } from "@/api/mockAuth";
+import { signUpWithPassword } from "@/api/supabaseAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,10 +29,12 @@ const schema = z
 type FormData = z.infer<typeof schema>;
 
 const Signup = () => {
-  const { signup } = useAuth();
+  const { setSessionUser } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [message, setMessage] = useState("");
 
   const {
     register,
@@ -44,10 +46,14 @@ const Signup = () => {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
+    setFormError("");
+    setMessage("");
     try {
-      const result = await mockSignup(data.name, data.email, data.password);
-      signup(result.user, result.token);
+      const result = await signUpWithPassword(data.name, data.email, data.password);
+      setSessionUser(result.user, result.session.access_token, result.onboarded);
       navigate("/onboarding");
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Signup failed.");
     } finally {
       setLoading(false);
     }
@@ -101,7 +107,7 @@ const Signup = () => {
             to="/"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            ← {t("app.backHome")}
+            â† {t("app.backHome")}
           </Link>
           <h1 className="mt-6 font-display text-3xl font-bold text-foreground">
             {t("auth.signupTitle")}
@@ -111,6 +117,16 @@ const Signup = () => {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
+            {formError && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {formError}
+              </p>
+            )}
+            {message && (
+              <p className="rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
+                {message}
+              </p>
+            )}
             <div>
               <Label htmlFor="name">{t("auth.fullName")}</Label>
               <Input
@@ -147,7 +163,7 @@ const Signup = () => {
                 type="password"
                 {...register("password")}
                 className="mt-1.5"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-destructive">
@@ -164,7 +180,7 @@ const Signup = () => {
                 type="password"
                 {...register("confirmPassword")}
                 className="mt-1.5"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               />
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-destructive">
@@ -198,3 +214,5 @@ const Signup = () => {
 };
 
 export default Signup;
+
+

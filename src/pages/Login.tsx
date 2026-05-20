@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
-import { mockLogin } from "@/api/mockAuth";
+import { signInWithPassword } from "@/api/supabaseAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,10 +22,11 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Login = () => {
-  const { login } = useAuth();
+  const { setSessionUser } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const {
     register,
@@ -37,10 +38,17 @@ const Login = () => {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
+    setFormError("");
     try {
-      const result = await mockLogin(data.email, data.password);
-      login(result.user, result.token);
+      const result = await signInWithPassword(data.email, data.password);
+      setSessionUser(
+        result.user,
+        result.session.access_token,
+        result.onboarded,
+      );
       navigate(result.user.role === "admin" ? "/admin" : "/home");
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -107,6 +115,11 @@ const Login = () => {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
+            {formError && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {formError}
+              </p>
+            )}
             <div>
               <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
