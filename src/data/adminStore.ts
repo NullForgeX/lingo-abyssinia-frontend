@@ -1,3 +1,5 @@
+import type { UserRole } from "@/types";
+
 export type AdminLesson = {
   id: string;
   title: string;
@@ -11,7 +13,7 @@ export type AdminUserActivity = {
   id: string;
   name: string;
   email: string;
-  role: "learner" | "admin";
+  role: UserRole;
   lessonsCompleted: number;
   streak: number;
   lastActive: string;
@@ -78,7 +80,7 @@ export const getAdminUsersActivity = (): AdminUserActivity[] => {
   const base: AdminUserActivity[] = readJSON(USERS_KEY, [
     { id: "u-1", name: "Abel", email: "abel@example.com", role: "learner", lessonsCompleted: 14, streak: 5, lastActive: "2026-05-08" },
     { id: "u-2", name: "Rahel", email: "rahel@example.com", role: "learner", lessonsCompleted: 22, streak: 11, lastActive: "2026-05-09" },
-    { id: "u-3", name: "System Admin", email: "admin@lingoabyssinia.com", role: "admin", lessonsCompleted: 0, streak: 0, lastActive: "2026-05-09" },
+    { id: "u-3", name: "System Admin", email: "admin@lingoabyssinia.com", role: "system_admin", lessonsCompleted: 0, streak: 0, lastActive: "2026-05-09" },
   ]);
 
   const signedInRaw = localStorage.getItem("lingo_user");

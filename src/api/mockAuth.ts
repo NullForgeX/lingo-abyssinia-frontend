@@ -4,13 +4,18 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const mockLogin = async (email: string, _password: string): Promise<{ user: User; token: string }> => {
   await delay(1000);
-  const isAdmin = email.toLowerCase().includes("admin");
+  const lower = email.toLowerCase();
+  const role: User['role'] = lower.includes('sysadmin') || lower.includes('system')
+    ? 'system_admin'
+    : lower.includes('admin') || lower.includes('editor') || lower.includes('content')
+      ? 'content_manager'
+      : 'learner';
   return {
     user: {
       id: 'user-1',
       name: email.split('@')[0],
       email,
-      role: isAdmin ? 'admin' : 'learner',
+      role,
       selectedLanguage: 'amharic',
       dailyGoal: 15,
       streak: 0,
