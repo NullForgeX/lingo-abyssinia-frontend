@@ -3,13 +3,20 @@ import { AdminUserActivity, getAdminUsersActivity, pushAdminAuditLog, saveAdminU
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { UserRole, userRoles } from "@/types";
 
 const PAGE_SIZE = 8;
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  learner: "Learner",
+  content_manager: "Content Manager",
+  system_admin: "System Admin",
+};
 
 const AdminUsers = () => {
   const [users, setUsers] = useState<AdminUserActivity[]>(getAdminUsersActivity());
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"all" | "learner" | "admin">("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | UserRole>("all");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -22,7 +29,7 @@ const AdminUsers = () => {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const updateRole = (id: string, role: "learner" | "admin") => {
+  const updateRole = (id: string, role: UserRole) => {
     const next = users.map((u) => (u.id === id ? { ...u, role } : u));
     setUsers(next);
     saveAdminUsersActivity(next);
@@ -38,10 +45,11 @@ const AdminUsers = () => {
       <div className="mt-6 rounded-2xl border border-border bg-card/95 p-5">
         <div className="mb-4 grid gap-3 md:grid-cols-3">
           <Input aria-label="Search users" placeholder="Search by name or email" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-          <select aria-label="Filter by role" value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value as any); setPage(1); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+          <select aria-label="Filter by role" value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value as "all" | UserRole); setPage(1); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
             <option value="all">All roles</option>
-            <option value="learner">Learners</option>
-            <option value="admin">Admins</option>
+            {userRoles.map((role) => (
+              <option key={role} value={role}>{ROLE_LABELS[role]}</option>
+            ))}
           </select>
           <div className="text-sm text-muted-foreground flex items-center">{filtered.length} results</div>
         </div>
@@ -67,7 +75,7 @@ const AdminUsers = () => {
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell className="capitalize">{user.role}</TableCell>
+                    <TableCell>{ROLE_LABELS[user.role]}</TableCell>
                     <TableCell>{user.lessonsCompleted}</TableCell>
                     <TableCell>{user.streak} days</TableCell>
                     <TableCell>{new Date(user.lastActive).toLocaleDateString()}</TableCell>
@@ -75,11 +83,12 @@ const AdminUsers = () => {
                       <select
                         aria-label={`Change role for ${user.email}`}
                         value={user.role}
-                        onChange={(e) => updateRole(user.id, e.target.value as "learner" | "admin")}
+                        onChange={(e) => updateRole(user.id, e.target.value as UserRole)}
                         className="h-8 rounded-md border border-input bg-background px-2 text-xs"
                       >
-                        <option value="learner">learner</option>
-                        <option value="admin">admin</option>
+                        {userRoles.map((role) => (
+                          <option key={role} value={role}>{ROLE_LABELS[role]}</option>
+                        ))}
                       </select>
                     </TableCell>
                   </TableRow>

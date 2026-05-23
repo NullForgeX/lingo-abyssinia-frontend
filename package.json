@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "codegen": "openapi-typescript ../lingo-backend/apps/api/openapi/openapi.v1.json -o src/api/generated.ts",
+    "codegen:check": "openapi-typescript ../lingo-backend/apps/api/openapi/openapi.v1.json -o /tmp/lingo.generated.ts && diff -q src/api/generated.ts /tmp/lingo.generated.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -80,6 +82,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
+    "openapi-typescript": "^7.4.3",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",

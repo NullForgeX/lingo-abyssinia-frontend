@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
 import { mockLogin } from "@/api/mockAuth";
+import { isStaffRole } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +41,7 @@ const Login = () => {
     try {
       const result = await mockLogin(data.email, data.password);
       login(result.user, result.token);
-      navigate(result.user.role === "admin" ? "/admin" : "/home");
+      navigate(isStaffRole(result.user.role) ? "/admin" : "/home");
     } finally {
       setLoading(false);
     }
