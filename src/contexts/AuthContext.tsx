@@ -46,8 +46,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const savedUser = localStorage.getItem("lingo_user");
     const onboarded = localStorage.getItem("lingo_onboarded");
     if (savedToken && savedUser) {
+      const parsedUser = JSON.parse(savedUser) as User & { role: User["role"] | "admin" };
+      const normalizedUser =
+        parsedUser.role === "admin"
+          ? { ...parsedUser, role: "system_admin" }
+          : parsedUser;
+
       setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      setUser(normalizedUser);
+      if (normalizedUser.role !== parsedUser.role) {
+        localStorage.setItem("lingo_user", JSON.stringify(normalizedUser));
+      }
       setNeedsOnboarding(onboarded !== "true");
     }
     setLoading(false);
