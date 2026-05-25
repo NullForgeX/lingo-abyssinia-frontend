@@ -8,6 +8,7 @@ import {
   BookOpenCheck,
   Users,
   ChartNoAxesCombined,
+  PanelsTopLeft,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,6 +20,7 @@ const AdminShell = () => {
 
   const navItems = [
     { label: "Overview", icon: LayoutDashboard, path: "/admin" },
+    { label: "Control Hub", icon: PanelsTopLeft, path: "/admin/hub" },
     { label: "Lessons (CRUD)", icon: BookOpenCheck, path: "/admin/lessons" },
     { label: "User Activity", icon: Users, path: "/admin/users" },
     { label: "Analytics", icon: ChartNoAxesCombined, path: "/admin/analytics" },

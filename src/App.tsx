@@ -27,10 +27,12 @@ import LanguageSelection from "./pages/LanguageSelection";
 import StreakHistory from "./pages/StreakHistory";
 import BadgeHistory from "./pages/BadgeHistory";
 import SkillProgress from "./pages/SkillProgress";
+import BiteLessons from "./pages/BiteLessons";
 import AdminOverview from "./pages/AdminOverview";
 import AdminLessons from "./pages/AdminLessons";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminContentHub from "./pages/AdminContentHub";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +68,7 @@ const App = () => (
                 >
                   <Route path="/home" element={<Home />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/bite-lessons" element={<BiteLessons />} />
                   <Route path="/community" element={<Community />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route path="/profile" element={<Profile />} />
@@ -85,6 +88,7 @@ const App = () => (
                   }
                 >
                   <Route path="/admin" element={<AdminOverview />} />
+                  <Route path="/admin/hub" element={<AdminContentHub />} />
                   <Route path="/admin/lessons" element={<AdminLessons />} />
                   <Route path="/admin/users" element={<AdminUsers />} />
                   <Route path="/admin/analytics" element={<AdminAnalytics />} />

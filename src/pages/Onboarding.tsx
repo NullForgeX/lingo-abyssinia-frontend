@@ -12,8 +12,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 const languages = [
   {
     language: "Amharic",
-    greeting: "Ã¡Ë†Â°Ã¡Ë†â€¹Ã¡Ë†Â",
-    script: "Ã¡Å Â ",
+    greeting: "ሰምይ",
+    script: "አ",
     description: "Official language of Ethiopia",
     key: "amharic" as const,
     color: "from-primary/20 to-primary/5",
@@ -28,8 +28,8 @@ const languages = [
   },
   {
     language: "Tigrinya",
-    greeting: "Ã¡Ë†Â°Ã¡Ë†â€¹Ã¡Ë†Â",
-    script: "Ã¡â€°Âµ",
+    greeting: "ሰምይ",
+    script: "ት",
     description: "Spoken in northern Ethiopia & Eritrea",
     key: "tigrinya" as const,
     color: "from-accent/20 to-accent/5",
@@ -40,21 +40,21 @@ const goals = [
   {
     minutes: 5,
     label: "Casual",
-    emoji: "Ã°Å¸Å’Â±",
+    emoji: "😊",
     desc: "5 minutes per day",
     subtitle: "Perfect for busy schedules",
   },
   {
     minutes: 15,
     label: "Regular",
-    emoji: "Ã°Å¸â€Â¥",
+    emoji: "🧘",
     desc: "15 minutes per day",
     subtitle: "Recommended for most learners",
   },
   {
     minutes: 30,
     label: "Intense",
-    emoji: "Ã°Å¸Å¡â‚¬",
+    emoji: "🚀",
     desc: "30 minutes per day",
     subtitle: "For serious language goals",
   },
@@ -237,7 +237,7 @@ const Onboarding = () => {
                   transition={{ type: "spring", delay: 0.2 }}
                   className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary/15"
                 >
-                  <span className="text-3xl">Ã¢ÂÂ±</span>
+                  <span className="text-3xl">⏠</span>
                 </motion.div>
                 <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
                   {t("onboarding.setGoal")}

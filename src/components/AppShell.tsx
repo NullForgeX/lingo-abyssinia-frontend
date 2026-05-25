@@ -2,6 +2,7 @@ import { Link, useLocation, Outlet } from "react-router-dom";
 import {
   House,
   BookOpen,
+  GraduationCap,
   Trophy,
   User,
   Flame,
@@ -26,6 +27,7 @@ const AppShell = () => {
   const navItems = [
     { label: t("app.home"), icon: House, path: "/home" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
+    { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
     { label: t("app.community"), icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
     { label: t("app.profile"), icon: User, path: "/profile" },

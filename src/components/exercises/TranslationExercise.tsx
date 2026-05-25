@@ -68,7 +68,7 @@ const TranslationExercise = ({ exercise, onAnswer }: Props) => {
             animate={{ opacity: 1 }}
             className="text-sm text-muted-foreground"
           >
-            Correct answer: <span className="font-semibold text-primary">{exercise.correctAnswer}</span>
+            Correct answer: <span className="font-semibold text-primary">{exercise.correctAnswerLabel ?? exercise.correctAnswer}</span>
           </motion.p>
         )}
 

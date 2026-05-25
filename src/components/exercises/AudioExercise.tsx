@@ -59,12 +59,6 @@ const AudioExercise = ({ exercise, onAnswer }: Props) => {
         <Volume2 className={`h-10 w-10 ${speaking ? "text-secondary" : "text-primary"}`} />
       </motion.button>
 
-      {exercise.audioText && (
-        <p className="text-center text-lg font-medium text-muted-foreground" style={{ fontFamily: "serif" }}>
-          {exercise.audioText}
-        </p>
-      )}
-
       {voiceError && (
         <p className="text-center text-xs text-muted-foreground">{voiceError}</p>
       )}
@@ -90,7 +84,9 @@ const AudioExercise = ({ exercise, onAnswer }: Props) => {
                 answered ? "cursor-default" : "cursor-pointer"
               }`}
             >
-              <span className="flex-1 font-medium text-foreground">{option}</span>
+              <span className="flex-1 font-medium text-foreground">
+                {exercise.optionLabels?.[option] ?? option}
+              </span>
               {answered && isSelected && isCorrect && <CheckCircle2 className="h-5 w-5 text-primary" />}
               {answered && isSelected && !isCorrect && <XCircle className="h-5 w-5 text-destructive" />}
             </motion.button>
