@@ -12,12 +12,14 @@ import {
   X,
   MessageSquare,
   MessageCircle,
+  Bot,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useI18n } from "@/contexts/I18nContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AppShell = () => {
   const { user, logout } = useAuth();
@@ -25,15 +27,28 @@ const AppShell = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const navItems = [
+  // Mobile bottom nav items (only main navigation)
+  const mobileNavItems = [
     { label: t("app.home"), icon: House, path: "/home" },
     { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
     { label: t("app.community"), icon: MessageSquare, path: "/community" },
-    { label: "AI Chat", icon: MessageCircle, path: "/chat" },
+    { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
+  ];
+
+  // Sidebar / hamburger menu items (includes Profile and AI Chat)
+  const sidebarNavItems = [
+    { label: t("app.home"), icon: House, path: "/home" },
+    { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
+    { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
+    { label: t("app.community"), icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
     { label: t("app.profile"), icon: User, path: "/profile" },
+    { label: "AI Chat", icon: MessageCircle, path: "/chat" },
   ];
+
+  // Only show floating button on /home page
+  const showFloatingChat = location.pathname === "/home";
 
   return (
     <div className="flex min-h-screen bg-background md:h-screen md:overflow-hidden">
@@ -50,7 +65,7 @@ const AppShell = () => {
           </h1>
         </div>
         <nav className="flex-1 overflow-hidden px-3 py-4 space-y-1.5">
-          {navItems.map((item) => {
+          {sidebarNavItems.map((item) => {
             const active = location.pathname === item.path;
             return (
               <Link
@@ -109,7 +124,7 @@ const AppShell = () => {
               </button>
             </div>
             <nav className="px-3 py-4 space-y-1.5">
-              {navItems.map((item) => {
+              {sidebarNavItems.map((item) => {
                 const active = location.pathname === item.path;
                 return (
                   <Link
@@ -175,9 +190,29 @@ const AppShell = () => {
         </main>
       </div>
 
+      {/* Floating AI Chat Button - Bottom Right */}
+      <AnimatePresence>
+        {showFloatingChat && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            className="fixed bottom-24 right-4 z-50 md:hidden"
+          >
+            <Link
+              to="/chat"
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500 shadow-xl shadow-black/25 hover:scale-105 active:scale-95 transition-transform"
+            >
+              <Bot className="h-6 w-6 text-white" />
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 flex border-t border-border bg-background md:hidden z-40">
-        {navItems.map((item) => {
+        {mobileNavItems.map((item) => {
           const active = location.pathname === item.path;
           return (
             <Link
