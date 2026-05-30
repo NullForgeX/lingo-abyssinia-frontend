@@ -19,7 +19,7 @@ const languageLabels: Record<UILanguage, string> = {
 };
 
 const english = {
-  "app.learn": "Learn",
+  "app.learn": "Practice",
   "app.leaderboard": "Leaderboard",
   "app.profile": "Profile",
   "app.logout": "Log out",
@@ -126,7 +126,7 @@ const translations: Record<UILanguage, Record<string, string>> = {
   english,
   amharic: {
     ...english,
-    "app.learn": "ተማር",
+    "app.learn": "ተለማመድ",
     "app.leaderboard": "የውጤት ሰሌዳ",
     "app.profile": "መገለጫ",
     "app.logout": "ውጣ",
@@ -178,7 +178,7 @@ const translations: Record<UILanguage, Record<string, string>> = {
   },
   oromo: {
     ...english,
-    "app.learn": "Baradhu",
+    "app.learn": "Beeji",
     "app.leaderboard": "Gabatee qabxii",
     "app.profile": "Profaayilii",
     "app.logout": "Ba'i",
@@ -209,7 +209,7 @@ const translations: Record<UILanguage, Record<string, string>> = {
   },
   tigrinya: {
     ...english,
-    "app.learn": "ተማሃር",
+    "app.learn": "ተለማድ",
     "app.leaderboard": "ሰሌዳ ውጽኢት",
     "app.profile": "መግለጺ",
     "app.logout": "ውጻእ",

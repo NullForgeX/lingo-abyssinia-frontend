@@ -248,18 +248,66 @@ function acceptedWithScript(language: Lang, value: string): string[] {
 }
 
 const unitBlueprints: Array<{ title: string; description: string; lessonTitles: string[] }> = [
-  { title: "Foundations", description: "Characters, greetings, polite phrases, and survival basics.", lessonTitles: ["Learn Characters", "Greetings", "Polite Words", "Introducing Yourself", "Mini Conversation"] },
-  { title: "Numbers and Time", description: "Learn numbers, days, months, and daily schedules.", lessonTitles: ["Learn Numbers", "Days of the Week", "Months of the Year", "Telling Time", "Daily Schedule"] },
-  { title: "People and Family", description: "Talk about family, friends, and roles.", lessonTitles: ["Family Members", "Describing People", "Professions", "Age and Birthday", "Social Introductions"] },
-  { title: "Home and Places", description: "Navigate places and ask for directions.", lessonTitles: ["Learn Directions", "Asking Directions", "Neighborhood", "At School", "City vs Village"] },
-  { title: "Food and Market", description: "Order food and shop with confidence.", lessonTitles: ["Common Foods", "At the Market", "Ordering Meals", "Quantities and Prices", "Food Preferences"] },
-  { title: "Actions and Verbs", description: "Core verbs and sentence building.", lessonTitles: ["Common Verbs", "Present Actions", "Past Actions", "Future Plans", "Mixed Practice"] },
-  { title: "Travel and Transport", description: "Move around and ask travel questions.", lessonTitles: ["Transportation Words", "Buying Tickets", "Asking Routes", "At the Station", "Trip Dialogues"] },
-  { title: "Health and Wellbeing", description: "Explain basic health needs and feelings.", lessonTitles: ["Body and Feelings", "At the Clinic", "Describing Symptoms", "Advice and Help", "Health Check Dialogue"] },
-  { title: "Work and Study", description: "Use language in school and workplace contexts.", lessonTitles: ["Classroom Language", "Office Expressions", "Tasks and Deadlines", "Meetings and Notes", "Formal Conversation"] },
-  { title: "Culture and Community", description: "Learn language tied to culture and social life.", lessonTitles: ["Holidays", "Community Events", "Traditions", "Music and Stories", "Cultural Dialogue"] },
-  { title: "Intermediate Fluency", description: "Longer comprehension and response drills.", lessonTitles: ["Listening Practice", "Reading Short Texts", "Responding Naturally", "Error Correction", "Fluency Challenge"] },
-  { title: "Mastery Path", description: "Advanced mixed practice and review.", lessonTitles: ["Advanced Vocabulary", "Complex Sentences", "Scenario Simulation", "Fast Review", "Final Mastery Test"] },
+  {
+    title: "Foundations",
+    description: "Characters, pronunciation, greetings, polite phrases, and survival basics.",
+    lessonTitles: ["Learn Characters", "Vowels and Sounds", "Syllable Practice", "Greetings", "Polite Words", "Introducing Yourself", "Asking Simple Questions", "Yes No and Maybe", "Mini Conversation", "Survival Review"],
+  },
+  {
+    title: "Numbers and Time",
+    description: "Learn numbers, dates, days, months, clock time, and daily schedules.",
+    lessonTitles: ["Learn Numbers", "Numbers 11 to 20", "Counting Objects", "Days of the Week", "Months of the Year", "Telling Time", "Morning and Evening", "Today Tomorrow Yesterday", "Daily Schedule", "Time Review"],
+  },
+  {
+    title: "People and Family",
+    description: "Talk about family, friends, roles, relationships, and personal details.",
+    lessonTitles: ["Family Members", "Extended Family", "Describing People", "Professions", "Age and Birthday", "Possession Words", "Talking About Friends", "Social Introductions", "Respectful Address", "Family Review"],
+  },
+  {
+    title: "Home and Places",
+    description: "Name places, navigate neighborhoods, and ask clear direction questions.",
+    lessonTitles: ["Learn Directions", "Rooms at Home", "Household Objects", "Asking Directions", "Neighborhood", "At School", "At the Shop", "City vs Village", "Where Questions", "Places Review"],
+  },
+  {
+    title: "Food and Market",
+    description: "Order meals, discuss preferences, shop at markets, and ask prices.",
+    lessonTitles: ["Common Foods", "Drinks and Coffee", "At the Market", "Ordering Meals", "Quantities and Prices", "Food Preferences", "Buying Ingredients", "Restaurant Dialogue", "Market Bargaining", "Food Review"],
+  },
+  {
+    title: "Actions and Verbs",
+    description: "Build sentences with common actions, tense patterns, and useful connectors.",
+    lessonTitles: ["Common Verbs", "Present Actions", "Past Actions", "Future Plans", "Commands and Requests", "Can and Want", "Like and Need", "Questions with Verbs", "Mixed Practice", "Verb Review"],
+  },
+  {
+    title: "Travel and Transport",
+    description: "Move around confidently with transportation, route, ticket, and trip language.",
+    lessonTitles: ["Transportation Words", "Buying Tickets", "Asking Routes", "At the Station", "Taxi and Bus Phrases", "Hotel Check In", "Travel Problems", "Trip Dialogues", "Airport Basics", "Travel Review"],
+  },
+  {
+    title: "Health and Wellbeing",
+    description: "Explain symptoms, needs, feelings, safety concerns, and simple advice.",
+    lessonTitles: ["Body and Feelings", "At the Clinic", "Describing Symptoms", "Advice and Help", "Medicine and Pharmacy", "Emergency Phrases", "Feelings and Mood", "Healthy Habits", "Health Check Dialogue", "Health Review"],
+  },
+  {
+    title: "Work and Study",
+    description: "Use language in classrooms, offices, meetings, tasks, and formal requests.",
+    lessonTitles: ["Classroom Language", "Office Expressions", "Tasks and Deadlines", "Meetings and Notes", "Emails and Messages", "Asking for Clarification", "Giving Opinions", "Formal Conversation", "Study Plan", "Work Review"],
+  },
+  {
+    title: "Culture and Community",
+    description: "Learn respectful language tied to holidays, community life, stories, and traditions.",
+    lessonTitles: ["Holidays", "Community Events", "Traditions", "Music and Stories", "Invitations", "Guests and Hosting", "Religious and Cultural Respect", "Celebration Dialogue", "Proverbs and Wisdom", "Culture Review"],
+  },
+  {
+    title: "Intermediate Fluency",
+    description: "Grow comprehension with longer listening, reading, response, and correction drills.",
+    lessonTitles: ["Listening Practice", "Reading Short Texts", "Responding Naturally", "Error Correction", "Longer Questions", "Short Story Practice", "Giving Reasons", "Comparing Things", "Fluency Challenge", "Intermediate Review"],
+  },
+  {
+    title: "Mastery Path",
+    description: "Advanced mixed practice for conversations, scenarios, review, and final mastery.",
+    lessonTitles: ["Advanced Vocabulary", "Complex Sentences", "Scenario Simulation", "Fast Review", "Final Mastery Test", "Conversation Repair", "Narrating Events", "Debate and Opinion", "Listening Speed Run", "Mastery Review"],
+  },
 ];
 
 const topicEnglish: Record<string, string[]> = {
@@ -609,8 +657,11 @@ function shuffleOptions<T>(arr: T[], seed: number): T[] {
 }
 
 function getTopicCard(language: Lang, unitTitle: string, lessonIndex: number): TopicCard {
-  const english = topicEnglish[unitTitle][lessonIndex];
-  const target = topicTargets[language][unitTitle][lessonIndex];
+  const englishTopics = topicEnglish[unitTitle];
+  const targetTopics = topicTargets[language][unitTitle];
+  const topicIndex = lessonIndex % Math.min(englishTopics.length, targetTopics.length);
+  const english = englishTopics[topicIndex];
+  const target = targetTopics[topicIndex];
   return { english, target, category: unitTitle };
 }
 
@@ -696,7 +747,7 @@ function makeExercises(language: Lang, unitTitle: string, lessonId: string, less
   const lx = lexicons[language];
   const langName = languageNames[language];
   const card = getTopicCard(language, unitTitle, lessonIndex);
-  const support = getTopicCard(language, unitTitle, (lessonIndex + 2) % 5);
+  const support = getTopicCard(language, unitTitle, lessonIndex + 2);
   const person = pick(lx.people, seed + lessonIndex);
   const place = pick(lx.places, seed * 2 + lessonIndex);
   const food = pick(lx.foods, seed * 3 + lessonIndex);
@@ -706,6 +757,8 @@ function makeExercises(language: Lang, unitTitle: string, lessonId: string, less
   const wordOptions = shuffleOptions([card.target, support.target, food, number], seed);
   const audioOptions = shuffleOptions([phrase, `${food} ${verb} ${number}`, `${place} ${lx.goodbye}`, `${lx.greeting} ${support.target}`], seed + 3);
   const practiceOptions = shuffleOptions([`${card.target} ${verb}`, `${lx.no} ${food}`, `${number} ${lx.thanks}`, `${place} ${person}`], seed + 9);
+  const examplePhrase = `${lx.greeting} ${card.target}`;
+  const exampleOptions = shuffleOptions([examplePhrase, `${lx.thanks} ${support.target}`, `${person} ${place}`, `${food} ${number}`], seed + 12);
 
   return [
     {
@@ -743,6 +796,24 @@ function makeExercises(language: Lang, unitTitle: string, lessonId: string, less
       optionLabels: labelsFor(language, practiceOptions),
       correctAnswer: `${card.target} ${verb}`,
       correctAnswerLabel: labelFor(language, `${card.target} ${verb}`),
+    },
+    {
+      id: `${lessonId}-e5`,
+      type: "audio",
+      question: `Listen for the example phrase using "${card.english}".`,
+      audioText: examplePhrase,
+      options: exampleOptions,
+      optionLabels: labelsFor(language, exampleOptions),
+      correctAnswer: examplePhrase,
+      correctAnswerLabel: labelFor(language, examplePhrase),
+    },
+    {
+      id: `${lessonId}-e6`,
+      type: "translation",
+      question: `Type the ${langName} word for this lesson example: "${card.english}".`,
+      correctAnswer: card.target,
+      correctAnswerLabel: labelFor(language, card.target),
+      acceptedAnswers: acceptedWithScript(language, card.target),
     },
   ];
 }

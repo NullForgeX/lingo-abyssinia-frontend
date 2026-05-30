@@ -19,19 +19,22 @@ const languages = [
     language: "Amharic",
     theme: "emerald" as const,
     action: "Script + speech",
-    description: "A warm entry into everyday expression, reading practice, and Ethiopian cultural context.",
+    description:
+      "A warm entry into everyday expression, reading practice, and Ethiopian cultural context.",
   },
   {
     language: "Afan Oromoo",
     theme: "gold" as const,
     action: "Conversation first",
-    description: "A practical path for greetings, daily dialogue, listening, and confident real-world use.",
+    description:
+      "A practical path for greetings, daily dialogue, listening, and confident real-world use.",
   },
   {
     language: "Tigrinya",
     theme: "rose" as const,
     action: "Listen + read",
-    description: "A clear route into useful phrases, pronunciation, stories, and script awareness.",
+    description:
+      "A clear route into useful phrases, pronunciation, stories, and script awareness.",
   },
 ];
 
@@ -89,6 +92,11 @@ const Landing = () => {
             href="#hero"
             className="flex items-center gap-2 font-display text-base font-bold text-foreground sm:text-lg"
           >
+            <img
+              src="/lingo_abyssinia_final.png"
+              alt="Lingo Abyssinia"
+              className="h-8 w-8 rounded-md object-cover"
+            />
             <span className="inline">Lingo Abyssinia</span>
           </a>
           <div className="hidden items-center gap-4 md:flex">
@@ -259,7 +267,11 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02, rotate: i % 2 === 0 ? -0.6 : 0.6 }}
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                  rotate: i % 2 === 0 ? -0.6 : 0.6,
+                }}
                 className="group relative overflow-hidden rounded-3xl border border-border/70 bg-card/90 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10"
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-white/0 to-primary/[0.05] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -282,7 +294,10 @@ const Landing = () => {
       </section>
 
       {/* Language Cards */}
-      <section id="languages" className="relative overflow-hidden py-24 md:py-32 bg-muted/35">
+      <section
+        id="languages"
+        className="relative overflow-hidden py-24 md:py-32 bg-muted/35"
+      >
         {/* Subtle background pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -311,7 +326,13 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="mt-12 grid gap-6 sm:grid-cols-3">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="mt-12 grid gap-6 sm:grid-cols-3"
+          >
             {languages.map((lang, i) => (
               <motion.div
                 key={lang.language}
