@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppShell from "./components/AppShell";
 import AdminShell from "./components/AdminShell";
@@ -37,6 +38,7 @@ const AdminLessons = lazy(() => import("./pages/AdminLessons"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const AdminContentHub = lazy(() => import("./pages/AdminContentHub"));
+const Chat = lazy(() => import("./pages/Chat"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -74,12 +76,15 @@ const App = () => (
                 <Route
                   element={
                     <ProtectedRoute allowRoles={["learner"]}>
-                      <AppShell />
+                      <ChatProvider>
+                        <AppShell />
+                      </ChatProvider>
                     </ProtectedRoute>
                   }
                 >
                   <Route path="/home" element={<Home />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/chat" element={<Chat />} />
                   <Route path="/bite-lessons" element={<BiteLessons />} />
                   <Route path="/bite-lesson/:language/:lessonId" element={<LessonView />} />
                   <Route path="/community" element={<Community />} />

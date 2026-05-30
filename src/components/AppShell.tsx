@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   MessageSquare,
+  MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
@@ -29,6 +30,7 @@ const AppShell = () => {
     { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
     { label: t("app.community"), icon: MessageSquare, path: "/community" },
+    { label: "AI Chat", icon: MessageCircle, path: "/chat" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
     { label: t("app.profile"), icon: User, path: "/profile" },
   ];
