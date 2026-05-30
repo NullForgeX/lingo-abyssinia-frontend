@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { mockRequestPasswordReset } from "@/api/mockAuth";
+import { requestPasswordReset } from "@/api/supabaseAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,8 +29,10 @@ const ForgotPassword = () => {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      const result = await mockRequestPasswordReset(data.email);
+      const result = await requestPasswordReset(data.email);
       setMessage(result.message);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not send reset email.");
     } finally {
       setLoading(false);
     }

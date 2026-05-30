@@ -2,6 +2,7 @@ import { Link, useLocation, Outlet } from "react-router-dom";
 import {
   House,
   BookOpen,
+  GraduationCap,
   Trophy,
   User,
   Flame,
@@ -25,6 +26,7 @@ const AppShell = () => {
 
   const navItems = [
     { label: t("app.home"), icon: House, path: "/home" },
+    { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
     { label: t("app.community"), icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
@@ -36,6 +38,11 @@ const AppShell = () => {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex md:h-screen md:w-72 md:shrink-0 md:flex-col md:overflow-hidden border-r border-sidebar-border/60 bg-[linear-gradient(180deg,hsl(var(--sidebar-background))_0%,hsl(var(--sidebar-background)/0.92)_100%)]">
         <div className="flex items-center gap-2 border-b border-sidebar-border/70 px-6 py-5">
+          <img
+            src="/lingo_abyssinia_final.png"
+            alt="Lingo Abyssinia"
+            className="h-8 w-8 rounded-md object-cover"
+          />
           <h1 className="font-display text-xl font-bold text-sidebar-foreground">
             LingoAbyssinia
           </h1>
@@ -80,9 +87,14 @@ const AppShell = () => {
             className="absolute inset-0 bg-foreground/40"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-72 bg-sidebar shadow-xl">
+          <aside className="absolute left-0 top-0 h-full w-[min(18rem,85vw)] bg-sidebar shadow-xl">
             <div className="flex items-center justify-between border-b border-sidebar-border px-6 py-5">
               <div className="flex items-center gap-2">
+                <img
+                  src="/lingo_abyssinia_final.png"
+                  alt="Lingo Abyssinia"
+                  className="h-8 w-8 rounded-md object-cover"
+                />
                 <h1 className="font-display text-xl font-bold text-sidebar-foreground">
                   LingoAbyssinia
                 </h1>
@@ -124,7 +136,7 @@ const AppShell = () => {
       )}
 
       {/* Main content */}
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-w-0 min-h-0 flex-1 flex-col">
         {/* Stats header */}
         <header className="flex items-center justify-between border-b border-border bg-card/70 px-3 py-3 backdrop-blur-sm sm:px-4 md:px-8">
           <button className="md:hidden" onClick={() => setSidebarOpen(true)}>
@@ -153,7 +165,10 @@ const AppShell = () => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-8">
+        <main
+          data-scroll-container
+          className="flex-1 overflow-y-auto p-3 pb-24 sm:p-4 sm:pb-24 md:p-8"
+        >
           <Outlet />
         </main>
       </div>

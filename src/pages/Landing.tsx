@@ -17,23 +17,24 @@ import ThemeToggle from "@/components/ThemeToggle";
 const languages = [
   {
     language: "Amharic",
-    greeting: "ሰላም",
-    script: "አ",
+    theme: "emerald" as const,
+    action: "Script + speech",
     description:
-      "The official language of Ethiopia, spoken by over 30 million people.",
+      "A warm entry into everyday expression, reading practice, and Ethiopian cultural context.",
   },
   {
-    language: "Oromo",
-    greeting: "Nagaa",
-    script: "O",
+    language: "Afan Oromoo",
+    theme: "gold" as const,
+    action: "Conversation first",
     description:
-      "The most widely spoken language in Ethiopia with a rich oral tradition.",
+      "A practical path for greetings, daily dialogue, listening, and confident real-world use.",
   },
   {
     language: "Tigrinya",
-    greeting: "ሰላም",
-    script: "ት",
-    description: "A Semitic language spoken in northern Ethiopia and Eritrea.",
+    theme: "rose" as const,
+    action: "Listen + read",
+    description:
+      "A clear route into useful phrases, pronunciation, stories, and script awareness.",
   },
 ];
 
@@ -91,6 +92,11 @@ const Landing = () => {
             href="#hero"
             className="flex items-center gap-2 font-display text-base font-bold text-foreground sm:text-lg"
           >
+            <img
+              src="/lingo_abyssinia_final.png"
+              alt="Lingo Abyssinia"
+              className="h-8 w-8 rounded-md object-cover"
+            />
             <span className="inline">Lingo Abyssinia</span>
           </a>
           <div className="hidden items-center gap-4 md:flex">
@@ -125,7 +131,7 @@ const Landing = () => {
         </div>
       </motion.nav>
 
-      {/* ───── Hero ───── */}
+      {/* Hero */}
       <section
         id="hero"
         ref={heroRef}
@@ -231,7 +237,7 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      {/* ───── Features ───── */}
+      {/* Features */}
       <section id="features" className="relative py-24 md:py-32">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--secondary)/0.18),transparent_44%),radial-gradient(circle_at_85%_65%,hsl(var(--primary)/0.16),transparent_42%)]" />
         <div className="mx-auto max-w-6xl px-6">
@@ -261,7 +267,11 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -6 }}
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                  rotate: i % 2 === 0 ? -0.6 : 0.6,
+                }}
                 className="group relative overflow-hidden rounded-3xl border border-border/70 bg-card/90 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10"
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-white/0 to-primary/[0.05] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -283,11 +293,14 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ───── Language Cards ───── */}
-      <section id="languages" className="relative py-24 md:py-32 bg-muted/35">
+      {/* Language Cards */}
+      <section
+        id="languages"
+        className="relative overflow-hidden py-24 md:py-32 bg-muted/35"
+      >
         {/* Subtle background pattern */}
         <div
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
               "radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)",
@@ -309,11 +322,17 @@ const Landing = () => {
               {t("landing.startPath")}
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Pick one to begin — you can always switch or add more later.
+              Pick one to begin - you can always switch or add more later.
             </p>
           </motion.div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-3">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="mt-12 grid gap-6 sm:grid-cols-3"
+          >
             {languages.map((lang, i) => (
               <motion.div
                 key={lang.language}
@@ -326,11 +345,11 @@ const Landing = () => {
                 <LanguageCard {...lang} />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ───── CTA ───── */}
+      {/* CTA */}
       <section id="start" className="relative py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 gradient-hero opacity-95" />
         <div className="absolute inset-0 mesh-veil" />
@@ -372,17 +391,17 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ───── Footer ───── */}
+      {/* Footer */}
       <footer className="border-t border-border bg-card/90 backdrop-blur-sm px-6 py-10">
         <div className="mx-auto max-w-5xl flex flex-col items-center gap-4 md:flex-row md:justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🇪🇹</span>
+            <span className="text-xl font-black text-primary">LA</span>
             <span className="font-display text-lg font-bold text-foreground">
               LingoAbyssinia
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {t("landing.footer")}
+            Copyright {t("landing.footer")}
           </p>
         </div>
       </footer>

@@ -54,7 +54,9 @@ const MultipleChoice = ({ exercise, onAnswer }: Props) => {
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-sm font-bold text-muted-foreground">
                 {String.fromCharCode(65 + idx)}
               </span>
-              <span className="flex-1 font-medium text-foreground">{option}</span>
+              <span className="flex-1 font-medium text-foreground">
+                {exercise.optionLabels?.[option] ?? option}
+              </span>
               {answered && isSelected && isCorrect && <CheckCircle2 className="h-5 w-5 text-primary" />}
               {answered && isSelected && !isCorrect && <XCircle className="h-5 w-5 text-destructive" />}
             </motion.button>

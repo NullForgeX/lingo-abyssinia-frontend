@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { Exercise } from '@/data/courseContent';
@@ -16,7 +16,9 @@ const TranslationExercise = ({ exercise, onAnswer }: Props) => {
 
   const handleSubmit = () => {
     if (answered || !input.trim()) return;
-    const correct = input.trim().toLowerCase() === exercise.correctAnswer.toLowerCase();
+    const normalize = (value: string) => value.trim().toLowerCase().replace(/[.,!?]/g, "").replace(/\s+/g, " ");
+    const accepted = [exercise.correctAnswer, ...(exercise.acceptedAnswers || [])].map(normalize);
+    const correct = accepted.includes(normalize(input));
     setIsCorrect(correct);
     setAnswered(true);
     setTimeout(() => onAnswer(correct), 1000);
@@ -66,7 +68,7 @@ const TranslationExercise = ({ exercise, onAnswer }: Props) => {
             animate={{ opacity: 1 }}
             className="text-sm text-muted-foreground"
           >
-            Correct answer: <span className="font-semibold text-primary">{exercise.correctAnswer}</span>
+            Correct answer: <span className="font-semibold text-primary">{exercise.correctAnswerLabel ?? exercise.correctAnswer}</span>
           </motion.p>
         )}
 
@@ -81,3 +83,4 @@ const TranslationExercise = ({ exercise, onAnswer }: Props) => {
 };
 
 export default TranslationExercise;
+

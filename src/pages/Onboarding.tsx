@@ -14,15 +14,15 @@ const languages = [
     language: "Amharic",
     greeting: "ሰላም",
     script: "አ",
-    description: "Official language of Ethiopia",
+    description: "Learn everyday words and phrases",
     key: "amharic" as const,
     color: "from-primary/20 to-primary/5",
   },
   {
-    language: "Oromo",
+    language: "Afan Oromoo",
     greeting: "Nagaa",
     script: "O",
-    description: "Most widely spoken in Ethiopia",
+    description: "Practice greetings and daily conversation",
     key: "oromo" as const,
     color: "from-secondary/20 to-secondary/5",
   },
@@ -30,7 +30,7 @@ const languages = [
     language: "Tigrinya",
     greeting: "ሰላም",
     script: "ት",
-    description: "Spoken in northern Ethiopia & Eritrea",
+    description: "Start with simple, useful expressions",
     key: "tigrinya" as const,
     color: "from-accent/20 to-accent/5",
   },
@@ -40,14 +40,14 @@ const goals = [
   {
     minutes: 5,
     label: "Casual",
-    emoji: "🌱",
+    emoji: "😊",
     desc: "5 minutes per day",
     subtitle: "Perfect for busy schedules",
   },
   {
     minutes: 15,
     label: "Regular",
-    emoji: "🔥",
+    emoji: "🧘",
     desc: "15 minutes per day",
     subtitle: "Recommended for most learners",
   },
@@ -79,7 +79,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10 sm:px-6 sm:py-12">
+    <div className="relative flex min-h-screen items-start justify-center overflow-x-hidden bg-background px-4 py-24 sm:items-center sm:px-6 sm:py-12">
       <div className="absolute right-4 top-4 z-30">
         <div className="flex items-center gap-2">
           <ThemeToggle iconOnly className="sm:hidden" />
@@ -94,7 +94,7 @@ const Onboarding = () => {
         <InteractiveGeezBackground count={18} className="opacity-40" />
       </div>
 
-      <div className="relative z-10 w-full max-w-2xl">
+      <div className="relative z-10 w-full max-w-4xl">
         {/* Step indicator */}
         <div className="mb-8 flex items-center justify-center gap-3 sm:mb-10">
           {[1, 2].map((s) => (
@@ -142,7 +142,7 @@ const Onboarding = () => {
                 >
                   <Languages className="h-8 w-8 text-primary" />
                 </motion.div>
-                <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+                <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
                   {t("onboarding.chooseLanguage")}
                 </h1>
                 <p className="mt-3 text-muted-foreground">
@@ -150,7 +150,7 @@ const Onboarding = () => {
                 </p>
               </div>
 
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-3">
                 {languages.map((lang, i) => (
                   <motion.button
                     key={lang.key}
@@ -160,7 +160,7 @@ const Onboarding = () => {
                     whileHover={{ y: -4, scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => setSelectedLang(lang.key)}
-                    className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-center transition-all duration-300 ${
+                    className={`group relative overflow-hidden rounded-2xl border-2 p-5 text-center transition-all duration-300 sm:p-6 ${
                       selectedLang === lang.key
                         ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
                         : "border-border bg-card hover:border-primary/40 hover:shadow-lg"
@@ -208,12 +208,16 @@ const Onboarding = () => {
                 ))}
               </div>
 
-              <div className="mt-10 flex justify-end">
+              <p className="mt-5 rounded-2xl border border-dashed border-border bg-card/80 px-4 py-3 text-center text-sm font-medium text-muted-foreground">
+                More local languages will be added soon...
+              </p>
+
+              <div className="mt-8 flex justify-center sm:mt-10 sm:justify-end">
                 <Button
                   size="lg"
                   disabled={!selectedLang}
                   onClick={() => setStep(2)}
-                  className="gap-2 rounded-xl px-8 py-6 text-base font-bold"
+                  className="w-full gap-2 rounded-xl px-8 py-6 text-base font-bold sm:w-auto"
                 >
                   {t("onboarding.continue")} <ArrowRight className="h-4 w-4" />
                   <Rocket className="h-4 w-4" />
@@ -237,9 +241,9 @@ const Onboarding = () => {
                   transition={{ type: "spring", delay: 0.2 }}
                   className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary/15"
                 >
-                  <span className="text-3xl">⏱</span>
+                  <span className="text-3xl">⏠</span>
                 </motion.div>
-                <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+                <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
                   {t("onboarding.setGoal")}
                 </h1>
                 <p className="mt-3 text-muted-foreground">
@@ -247,7 +251,7 @@ const Onboarding = () => {
                 </p>
               </div>
 
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-3">
                 {goals.map((goal, i) => (
                   <motion.button
                     key={goal.minutes}
@@ -257,7 +261,7 @@ const Onboarding = () => {
                     whileHover={{ y: -4, scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => setSelectedGoal(goal.minutes)}
-                    className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-center transition-all duration-300 ${
+                    className={`group relative overflow-hidden rounded-2xl border-2 p-5 text-center transition-all duration-300 sm:p-6 ${
                       selectedGoal === goal.minutes
                         ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
                         : "border-border bg-card hover:border-primary/40 hover:shadow-lg"
@@ -286,12 +290,12 @@ const Onboarding = () => {
                 ))}
               </div>
 
-              <div className="mt-10 flex justify-between">
+              <div className="mt-8 flex flex-col-reverse gap-3 sm:mt-10 sm:flex-row sm:justify-between">
                 <Button
                   variant="outline"
                   size="lg"
                   onClick={() => setStep(1)}
-                  className="gap-2 rounded-xl px-6 py-6"
+                  className="w-full gap-2 rounded-xl px-6 py-6 sm:w-auto"
                 >
                   <ArrowLeft className="h-4 w-4" /> {t("onboarding.back")}
                 </Button>
@@ -299,7 +303,7 @@ const Onboarding = () => {
                   size="lg"
                   disabled={!selectedGoal}
                   onClick={finish}
-                  className="gap-2 rounded-xl px-8 py-6 text-base font-bold gradient-gold text-gold-foreground"
+                  className="w-full gap-2 rounded-xl px-8 py-6 text-base font-bold gradient-gold text-gold-foreground sm:w-auto"
                 >
                   {t("onboarding.startLearning")} <Rocket className="h-4 w-4" />
                 </Button>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLesson } from "@/data/courseContent";
+import { getLesson, getNextLesson } from "@/data/courseContent";
 import { Progress } from "@/components/ui/progress";
 import MultipleChoice from "@/components/exercises/MultipleChoice";
 import TranslationExercise from "@/components/exercises/TranslationExercise";
@@ -21,6 +21,11 @@ const LessonPlayer = () => {
 
   const lesson = useMemo(
     () => getLesson(user?.selectedLanguage || "amharic", lessonId || ""),
+    [user?.selectedLanguage, lessonId],
+  );
+
+  const nextLesson = useMemo(
+    () => getNextLesson(user?.selectedLanguage || "amharic", lessonId || ""),
     [user?.selectedLanguage, lessonId],
   );
 
@@ -58,6 +63,9 @@ const LessonPlayer = () => {
             correctAnswers: correctCount,
             xpEarned: 0,
             passed: false,
+            lessonId: lesson.id,
+            nextLessonId: nextLesson?.id,
+            nextLessonTitle: nextLesson?.title,
           },
         });
       }, 500);
@@ -78,6 +86,8 @@ const LessonPlayer = () => {
             xpEarned: xp,
             passed: accuracy >= 0.5,
             lessonId: lesson.id,
+            nextLessonId: nextLesson?.id,
+            nextLessonTitle: nextLesson?.title,
           },
         });
       } else {
@@ -130,20 +140,15 @@ const LessonPlayer = () => {
           >
             <Card className="overflow-hidden border border-border/70 bg-card/90 shadow-2xl shadow-black/15 backdrop-blur-sm">
               <CardContent className="p-5 md:p-8">
-                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Lesson practice
-                    </p>
-                    <h1 className="mt-1 font-display text-2xl font-bold text-foreground md:text-3xl">
-                      Stay sharp, move fast
-                    </h1>
-                  </div>
-                  <div className="rounded-2xl border border-border/70 bg-background/80 px-4 py-3 text-left sm:text-right">
-                    <p className="text-xs text-muted-foreground">
+                <div className="mb-5 flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Lesson practice
+                  </p>
+                  <div className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-right">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Session progress
                     </p>
-                    <p className="font-display text-lg font-bold text-foreground">
+                    <p className="text-sm font-bold text-foreground">
                       {Math.round(progress)}%
                     </p>
                   </div>
@@ -182,3 +187,4 @@ const LessonPlayer = () => {
 };
 
 export default LessonPlayer;
+

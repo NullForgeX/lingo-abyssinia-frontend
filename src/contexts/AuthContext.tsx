@@ -5,6 +5,14 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import { supabase } from "@/lib/supabase";
+import {
+  getCurrentSession,
+  getProfile,
+  signOut,
+  updatePreferences,
+  updateProfile,
+} from "@/api/supabaseAuth";
 import { User, UserPreferences } from "@/types";
 
 interface AuthContextType {
@@ -12,17 +20,16 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (user: User, token: string) => void;
-  signup: (user: User, token: string) => void;
-  logout: () => void;
-  setPreferences: (prefs: UserPreferences) => void;
+  setSessionUser: (user: User, token: string | null, onboarded: boolean) => void;
+  logout: () => Promise<void>;
+  setPreferences: (prefs: UserPreferences) => Promise<void>;
   updateUser: (
     updates: Partial<
-      Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal">
+      Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal" | "streak" | "gems">
     >,
-  ) => void;
+  ) => Promise<void>;
   needsOnboarding: boolean;
-  completeOnboarding: () => void;
+  completeOnboarding: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -41,86 +48,104 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem("lingo_token");
-    const savedUser = localStorage.getItem("lingo_user");
-    const onboarded = localStorage.getItem("lingo_onboarded");
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-      setNeedsOnboarding(onboarded !== "true");
+  const loadSession = useCallback(async () => {
+    try {
+      const session = await getCurrentSession();
+      setToken(session?.access_token ?? null);
+
+      if (session?.user) {
+        const profile = await getProfile(session.user);
+        setUser(profile.user);
+        setNeedsOnboarding(
+          profile.user.role === "learner" && !profile.onboarded,
+        );
+      } else {
+        setUser(null);
+        setNeedsOnboarding(false);
+      }
+    } catch (error) {
+      console.error("Failed to load Supabase session", error);
+      setUser(null);
+      setToken(null);
+      setNeedsOnboarding(false);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  const login = useCallback((user: User, token: string) => {
-    setUser(user);
-    setToken(token);
-    localStorage.setItem("lingo_token", token);
-    localStorage.setItem("lingo_user", JSON.stringify(user));
-    const onboarded = localStorage.getItem("lingo_onboarded");
-    setNeedsOnboarding(user.role === "learner" && onboarded !== "true");
-  }, []);
+  useEffect(() => {
+    loadSession();
 
-  const signup = useCallback((user: User, token: string) => {
-    setUser(user);
-    setToken(token);
-    localStorage.setItem("lingo_token", token);
-    localStorage.setItem("lingo_user", JSON.stringify(user));
-    setNeedsOnboarding(user.role === "learner");
-  }, []);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setToken(session?.access_token ?? null);
+      if (!session?.user) {
+        setUser(null);
+        setNeedsOnboarding(false);
+      }
+    });
 
-  const logout = useCallback(() => {
+    return () => subscription.unsubscribe();
+  }, [loadSession]);
+
+  const setSessionUser = useCallback(
+    (nextUser: User, nextToken: string | null, onboarded: boolean) => {
+      setUser(nextUser);
+      setToken(nextToken);
+      setNeedsOnboarding(nextUser.role === "learner" && !onboarded);
+    },
+    [],
+  );
+
+  const logout = useCallback(async () => {
+    await signOut();
     setUser(null);
     setToken(null);
-    localStorage.removeItem("lingo_token");
-    localStorage.removeItem("lingo_user");
-    localStorage.removeItem("lingo_onboarded");
     setNeedsOnboarding(false);
   }, []);
 
   const setPreferences = useCallback(
-    (prefs: UserPreferences) => {
-      setUser((prev) =>
-        prev
-          ? {
-              ...prev,
-              selectedLanguage: prefs.language,
-              dailyGoal: prefs.dailyGoal,
-            }
-          : null,
-      );
-      if (user) {
-        const updated = {
-          ...user,
-          selectedLanguage: prefs.language,
-          dailyGoal: prefs.dailyGoal,
-        };
-        localStorage.setItem("lingo_user", JSON.stringify(updated));
+    async (prefs: UserPreferences) => {
+      if (!user) return;
+      try {
+        const updated = await updatePreferences(user.id, prefs);
+        setUser(updated);
+      } catch (error) {
+        console.error("Failed to persist preferences", error);
+        setUser((prev) => prev ? { ...prev, selectedLanguage: prefs.language, dailyGoal: prefs.dailyGoal } : prev);
       }
     },
     [user],
   );
 
-  const completeOnboarding = useCallback(() => {
-    localStorage.setItem("lingo_onboarded", "true");
+  const completeOnboarding = useCallback(async () => {
+    if (!user) return;
+    try {
+      const updated = await updateProfile(user.id, { onboarded: true });
+      setUser(updated);
+    } catch (error) {
+      console.error("Failed to persist onboarding", error);
+    }
     setNeedsOnboarding(false);
-  }, []);
+  }, [user]);
 
   const updateUser = useCallback(
-    (
+    async (
       updates: Partial<
-        Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal">
+        Pick<User, "name" | "email" | "selectedLanguage" | "dailyGoal" | "streak" | "gems">
       >,
     ) => {
-      setUser((prev) => {
-        if (!prev) return null;
-        const updated = { ...prev, ...updates };
-        localStorage.setItem("lingo_user", JSON.stringify(updated));
-        return updated;
-      });
+      if (!user) return;
+      try {
+        const updated = await updateProfile(user.id, updates);
+        setUser(updated);
+      } catch (error) {
+        console.error("Failed to persist profile update", error);
+        setUser((prev) => prev ? { ...prev, ...updates } : prev);
+      }
     },
-    [],
+    [user],
   );
 
   return (
@@ -130,8 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         token,
         loading,
         isAuthenticated: !!token,
-        login,
-        signup,
+        setSessionUser,
         logout,
         setPreferences,
         updateUser,
@@ -143,3 +167,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     </AuthContext.Provider>
   );
 };
+

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Home as HomeIcon,
@@ -9,54 +9,136 @@ import {
   BookOpen,
   Trophy,
   ArrowRight,
+  Search,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLessonProgress } from "@/hooks/useLessonProgress";
-import { getCourse } from "@/data/courseContent";
 import { useI18n } from "@/contexts/I18nContext";
+import LanguageCard from "@/components/LanguageCard";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { getCourse } from "@/data/courseContent";
+
+const languages = [
+  {
+    key: "amharic" as const,
+    language: "Amharic",
+    greeting: "ሰለም",
+    script: "አ",
+    description: "Official language of Ethiopia with broad media and education coverage.",
+    levels: ["beginner", "intermediate", "advanced"] as const,
+    highlights: ["Ge'ez script", "Formal + daily use", "Large content library"],
+  },
+  {
+    key: "oromo" as const,
+    language: "Afan Oromoo",
+    greeting: "Nagaa",
+    script: "O",
+    description: "Most widely spoken language in Ethiopia with vibrant daily conversation usage.",
+    levels: ["beginner", "intermediate", "advanced"] as const,
+    highlights: ["Fast conversational gains", "Rich oral tradition", "Regional variety"],
+  },
+  {
+    key: "tigrinya" as const,
+    language: "Tigrinya",
+    greeting: "ሰላም",
+    script: "ት",
+    description: "Semitic language spoken across northern Ethiopia and Eritrea.",
+    levels: ["beginner", "intermediate", "advanced"] as const,
+    highlights: ["Ge'ez script depth", "Strong literary forms", "Cross-region context"],
+  },
+];
+
+const levels = ["all", "beginner", "intermediate", "advanced"] as const;
+type Level = (typeof levels)[number];
+
+// Skill chart data - in production this would come from user progress
+const skillData = [
+  { skill: "Vocabulary", score: 74 },
+  { skill: "Reading", score: 62 },
+  { skill: "Listening", score: 57 },
+  { skill: "Writing", score: 69 },
+  { skill: "Speaking", score: 54 },
+];
+
+const chartConfig: ChartConfig = {
+  score: {
+    label: "Score",
+    color: "hsl(var(--primary))",
+  },
+};
+
+// Sample badges - in production this would come from user data
+const badges = [
+  { id: "b1", name: "First Lesson", description: "Complete your first lesson", earnedAt: "2026-04-12" },
+  { id: "b2", name: "7-Day Streak", description: "Practice for 7 days", earnedAt: "2026-04-21" },
+  { id: "b3", name: "Vocabulary Starter", description: "Learn 50 words", earnedAt: "2026-05-02" },
+  { id: "b4", name: "Quiz Master", description: "Score 90% on 5 quizzes", earnedAt: "2026-05-07" },
+];
 
 const Home = () => {
-  const { user } = useAuth();
-  const { t } = useI18n();
+  const { user, updateUser } = useAuth();
+  const { t, languageLabel } = useI18n();
   const { completedLessons } = useLessonProgress();
-
   const course = getCourse(user?.selectedLanguage ?? "amharic");
-  const totalLessons = course.units.flatMap((u) => u.lessons).length;
+  const totalLessons = course?.units?.flatMap((u: { lessons: unknown[] }) => u.lessons).length ?? 0;
   const completion = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
 
-  const quickLinks = [
-    {
-      title: t("home.languageSelection"),
-      desc: t("home.languageSelectionDesc"),
-      to: "/language-selection",
-      icon: Languages,
-      accent: "from-primary/20 to-primary/5",
-    },
-    {
-      title: t("home.streakHistory"),
-      desc: t("home.streakHistoryDesc"),
-      to: "/progress/streaks",
-      icon: Flame,
-      accent: "from-accent/20 to-accent/5",
-    },
-    {
-      title: t("home.badgeHistory"),
-      desc: t("home.badgeHistoryDesc"),
-      to: "/progress/badges",
-      icon: BadgeCheck,
-      accent: "from-secondary/20 to-secondary/5",
-    },
-    {
-      title: t("home.skillChart"),
-      desc: t("home.skillChartDesc"),
-      to: "/progress/skills",
-      icon: BarChart3,
-      accent: "from-primary/10 to-secondary/10",
-    },
-  ];
+  // Language selection state
+  const [selected, setSelected] = useState<"amharic" | "oromo" | "tigrinya">(
+    user?.selectedLanguage ?? "amharic",
+  );
+  const [saved, setSaved] = useState(false);
+  const [langLevel, setLangLevel] = useState<Level>("all");
+  const [search, setSearch] = useState("");
+
+  // Streak history state
+  const currentStreak = user?.streak ?? 0;
+  const streakHistory = useMemo(
+    () =>
+      Array.from({ length: 14 }, (_, i) => {
+        const daysAgo = 13 - i;
+        const date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+        const active = i > Math.max(0, 13 - currentStreak);
+        return {
+          key: date.toISOString(),
+          label: date.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+          active,
+        };
+      }),
+    [currentStreak],
+  );
+
+  const visibleLanguages = useMemo(() => {
+    return languages
+      .filter((l) => (langLevel === "all" ? true : l.levels.includes(langLevel)))
+      .filter(
+        (l) =>
+          `${l.language} ${l.description} ${l.highlights.join(" ")}`
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+      );
+  }, [langLevel, search]);
+
+  const saveLanguage = () => {
+    updateUser({ selectedLanguage: selected });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1800);
+  };
 
   return (
-    <div className="pb-20 md:pb-0">
+    <div className="pb-20 md:pb-0 space-y-6">
+      {/* Welcome Header */}
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -64,7 +146,6 @@ const Home = () => {
       >
         <div className="absolute -top-24 right-0 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-secondary/20 blur-3xl" />
-
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -78,18 +159,18 @@ const Home = () => {
               Your central hub for language tools, progress insights, and shortcuts.
             </p>
           </div>
-
-          <Link
-            to="/dashboard"
+          <a
+            href="/dashboard"
             className="inline-flex items-center gap-2 self-start rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:brightness-105"
           >
             {t("home.goToLearn")}
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </a>
         </div>
       </motion.section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-3">
+      {/* Quick Stats */}
+      <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">{t("dashboard.currentStreak")}</p>
@@ -115,44 +196,170 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="mt-8">
-        <h2 className="font-display text-xl font-bold text-foreground">{t("home.quickAccess")}</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {quickLinks.map((item, i) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-            >
-              <Link
-                to={item.to}
-                className="group relative block overflow-hidden rounded-2xl border border-border/80 bg-card/95 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.accent} opacity-0 transition-opacity group-hover:opacity-100`} />
-                <div className="relative">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-semibold text-foreground">{item.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
-                    </div>
-                    <item.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                    {t("home.open")}
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
+      {/* Language Selection Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+      >
+        <div className="mb-4 flex items-center gap-2">
+          <Languages className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-bold text-foreground">{t("home.languageSelection")}</h2>
+        </div>
+
+        <div className="mb-4 rounded-xl border border-border/60 bg-background/60 p-3">
+          <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+            <div className="relative">
+              <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by language or highlight"
+                className="pl-9"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {levels.map((lvl) => (
+                <button
+                  key={lvl}
+                  onClick={() => setLangLevel(lvl)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold capitalize ${
+                    langLevel === lvl
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border bg-background text-foreground"
+                  }`}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleLanguages.map((lang) => (
+            <div key={lang.key} className="space-y-2">
+              <LanguageCard
+                language={lang.language}
+                description={lang.description}
+                action="Select"
+                selected={selected === lang.key}
+                onClick={() => setSelected(lang.key)}
+              />
+              <div className="flex flex-wrap gap-1.5 px-1">
+                {lang.levels.map((lvl) => (
+                  <Badge key={lvl} variant="outline" className="capitalize text-xs">
+                    {lvl}
+                  </Badge>
+                ))}
+                {lang.highlights.map((h) => (
+                  <Badge key={h} variant="secondary" className="text-xs">
+                    {h}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
-      </section>
 
-      <section className="mt-8 rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
+        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-border/60 bg-background/60 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <Button onClick={saveLanguage} size="sm" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              Save Language
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Current: {languageLabel(user?.selectedLanguage ?? "amharic")}
+            </span>
+          </div>
+          {saved && <span className="text-sm text-primary">Language updated!</span>}
+        </div>
+      </motion.section>
+
+      {/* Streak History Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+      >
+        <div className="mb-4 flex items-center gap-2">
+          <Flame className="h-5 w-5 text-accent" />
+          <h2 className="font-display text-lg font-bold text-foreground">{t("home.streakHistory")}</h2>
+        </div>
+        <p className="mb-4 text-sm text-muted-foreground">{t("home.streakHistoryDesc")}</p>
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+          {streakHistory.map((day) => (
+            <div
+              key={day.key}
+              className={`rounded-lg border px-2 py-3 text-center text-xs ${
+                day.active
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border bg-muted/30 text-muted-foreground"
+              }`}
+            >
+              <p className="font-semibold">{day.label}</p>
+              <p className="mt-0.5 text-[10px]">{day.active ? "Active" : "Missed"}</p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Badge History Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+      >
+        <div className="mb-4 flex items-center gap-2">
+          <BadgeCheck className="h-5 w-5 text-secondary" />
+          <h2 className="font-display text-lg font-bold text-foreground">{t("home.badgeHistory")}</h2>
+        </div>
+        <p className="mb-4 text-sm text-muted-foreground">{t("home.badgeHistoryDesc")}</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {badges.map((badge) => (
+            <div key={badge.id} className="rounded-lg border border-border/60 bg-background/60 px-4 py-3">
+              <p className="font-semibold text-foreground">{badge.name}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{badge.description}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Earned {new Date(badge.earnedAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Skill Chart Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+      >
+        <div className="mb-4 flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-bold text-foreground">{t("home.skillChart")}</h2>
+        </div>
+        <p className="mb-4 text-sm text-muted-foreground">{t("home.skillChartDesc")}</p>
+        <ChartContainer config={chartConfig} className="h-[280px] w-full">
+          <BarChart accessibilityLayer data={skillData} margin={{ left: 10, right: 10 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey="skill" tickLine={false} axisLine={false} tickMargin={10} />
+            <YAxis domain={[0, 100]} tickLine={false} axisLine={false} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <Bar dataKey="score" radius={8} fill="var(--color-score)" />
+          </BarChart>
+        </ChartContainer>
+      </motion.section>
+
+      {/* General Info Footer */}
+      <section className="rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
         <h2 className="font-display text-lg font-bold text-foreground">{t("home.generalInfo")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Daily goal: {user?.dailyGoal ?? 15} minutes. Overall completion: {completion}%. Continue from Learn to keep your streak active and unlock more badges.
+          Daily goal: {user?.dailyGoal ?? 15} minutes. Overall completion: {completion}%. Continue from
+          Practice to keep your streak active and unlock more badges.
         </p>
       </section>
     </div>

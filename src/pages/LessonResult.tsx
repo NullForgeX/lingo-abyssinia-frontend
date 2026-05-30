@@ -14,6 +14,8 @@ interface ResultState {
   xpEarned: number;
   passed: boolean;
   lessonId?: string;
+  nextLessonId?: string;
+  nextLessonTitle?: string;
 }
 
 const LessonResult = () => {
@@ -25,16 +27,16 @@ const LessonResult = () => {
 
   useEffect(() => {
     if (state?.passed && state?.lessonId) {
-      markComplete(state.lessonId);
+      markComplete(state.lessonId, state.xpEarned);
     }
-  }, [state?.passed, state?.lessonId, markComplete]);
+  }, [state?.passed, state?.lessonId, state?.xpEarned, markComplete]);
 
   if (!state) {
     navigate("/dashboard");
     return null;
   }
 
-  const { lessonTitle, totalExercises, correctAnswers, xpEarned, passed } =
+  const { lessonTitle, totalExercises, correctAnswers, xpEarned, passed, nextLessonId, nextLessonTitle } =
     state;
   const accuracy = Math.round((correctAnswers / totalExercises) * 100);
 
@@ -119,20 +121,46 @@ const LessonResult = () => {
               </div>
             </motion.div>
 
-            {/* Actions */}
+                        {/* Actions */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
               className="mt-8 flex flex-col gap-3"
             >
-              <Button
-                onClick={() => navigate("/dashboard")}
-                size="lg"
-                className="w-full gap-2 rounded-2xl"
-              >
-                {t("app.continue")} <ArrowRight className="h-4 w-4" />
-              </Button>
+              {passed && nextLessonId ? (
+                <>
+                  <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left">
+                    <p className="text-sm font-semibold text-foreground">Ready for the next lesson?</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      You passed this lesson. Choose when to continue.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => navigate(`/lesson/${nextLessonId}`)}
+                    size="lg"
+                    className="w-full gap-2 rounded-2xl"
+                  >
+                    Continue to {nextLessonTitle || "Next Lesson"} <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    onClick={() => navigate("/dashboard")}
+                    variant="outline"
+                    size="lg"
+                    className="w-full rounded-2xl"
+                  >
+                    Not now — back to dashboard
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => navigate("/dashboard")}
+                  size="lg"
+                  className="w-full gap-2 rounded-2xl"
+                >
+                  {passed ? "Back to Dashboard" : t("app.continue")} <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
               {!passed && (
                 <Button
                   onClick={() => navigate(-1)}

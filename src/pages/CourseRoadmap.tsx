@@ -15,7 +15,7 @@ const CourseRoadmap = () => {
 
   const langLabels = {
     amharic: "Amharic",
-    oromo: "Oromo",
+    oromo: "Afan Oromoo",
     tigrinya: "Tigrinya",
   };
   const langName = user?.selectedLanguage ? langLabels[user.selectedLanguage] : "Amharic";
@@ -24,10 +24,15 @@ const CourseRoadmap = () => {
 
   const getStatus = (lessonId: string): "completed" | "active" | "locked" => {
     if (completedLessons.includes(lessonId)) return "completed";
-    const idx = allLessons.findIndex((l) => l.id === lessonId);
-    if (idx === 0) return "active";
-    const prev = allLessons[idx - 1];
-    if (prev && completedLessons.includes(prev.id)) return "active";
+
+    const unit = course.units.find((courseUnit) =>
+      courseUnit.lessons.some((lesson) => lesson.id === lessonId),
+    );
+    const unitLessonIndex = unit?.lessons.findIndex((lesson) => lesson.id === lessonId) ?? -1;
+    if (unitLessonIndex === 0) return "active";
+
+    const previousLesson = unit?.lessons[unitLessonIndex - 1];
+    if (previousLesson && completedLessons.includes(previousLesson.id)) return "active";
     return "locked";
   };
 
