@@ -13,7 +13,7 @@ type Props = {
 };
 
 const LanguageSwitcher = ({ className = "", iconOnly = false }: Props) => {
-  const { uiLanguage, setUiLanguage, languageLabel } = useI18n();
+  const { uiLanguage, setUiLanguage, languageLabel, t } = useI18n();
 
   const options: Array<{ value: UILanguage; code: string }> = [
     { value: "english", code: "EN" },
@@ -27,7 +27,7 @@ const LanguageSwitcher = ({ className = "", iconOnly = false }: Props) => {
       <Select value={uiLanguage} onValueChange={(value) => setUiLanguage(value as UILanguage)}>
         <SelectTrigger
           className={`${iconOnly ? "h-9 w-12" : "h-9 w-16"} rounded-lg border border-border/70 bg-card px-2 text-xs font-bold text-foreground shadow-sm focus:ring-1 focus:ring-primary/40`}
-          aria-label="Interface language"
+          aria-label={t("app.interfaceLanguage")}
         >
           <SelectValue placeholder="EN" />
         </SelectTrigger>
@@ -42,7 +42,7 @@ const LanguageSwitcher = ({ className = "", iconOnly = false }: Props) => {
           ))}
         </SelectContent>
         <span className="sr-only" aria-live="polite">
-          {languageLabel(uiLanguage)} selected
+          {languageLabel(uiLanguage)} {t("app.selected")}
         </span>
       </Select>
     </div>

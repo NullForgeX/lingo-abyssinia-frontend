@@ -130,10 +130,10 @@
   .gradient-hero {
     background: linear-gradient(
       145deg,
-      hsl(var(--ethiopian-green)) 0%,
-      hsl(var(--ethiopian-green) / 0.88) 32%,
-      hsl(var(--accent) / 0.78) 68%,
-      hsl(var(--gold) / 0.9) 100%
+      hsl(145 45% 38%) 0%,
+      hsl(145 45% 38% / 0.88) 32%,
+      hsl(5 70% 55% / 0.78) 68%,
+      hsl(43 85% 55% / 0.9) 100%
     );
   }
 
@@ -176,7 +176,7 @@
     text-shadow: 0 0 12px hsl(var(--gold) / 0.35);
     transform: translate3d(0, 0, 0);
     will-change: transform, opacity;
-    animation: geez-float var(--float-duration) ease-in-out var(--float-delay) infinite alternate;
+    transition: filter 500ms ease;
   }
   .text-gradient {
     @apply bg-clip-text text-transparent;
@@ -185,9 +185,9 @@
 
   .mesh-veil {
     background-image:
-      radial-gradient(circle at 25% 25%, hsl(var(--secondary) / 0.18), transparent 40%),
-      radial-gradient(circle at 75% 20%, hsl(var(--primary) / 0.22), transparent 42%),
-      radial-gradient(circle at 50% 80%, hsl(var(--accent) / 0.12), transparent 46%);
+      radial-gradient(circle at 25% 25%, hsl(43 85% 55% / 0.18), transparent 40%),
+      radial-gradient(circle at 75% 20%, hsl(145 45% 38% / 0.22), transparent 42%),
+      radial-gradient(circle at 50% 80%, hsl(5 70% 55% / 0.12), transparent 46%);
   }
 
   .grain-overlay {
@@ -201,20 +201,3 @@
 }
 
 
-@keyframes geez-float {
-  0% {
-    transform: translate3d(var(--float-from-x), var(--float-from-y), 0) rotate(var(--float-from-rotate));
-  }
-  50% {
-    transform: translate3d(var(--float-mid-x), var(--float-mid-y), 0) rotate(var(--float-mid-rotate));
-  }
-  100% {
-    transform: translate3d(var(--float-x), var(--float-y), 0) rotate(var(--float-rotate));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .geez-background-char {
-    animation-duration: 24s;
-  }
-}

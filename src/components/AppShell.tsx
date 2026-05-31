@@ -9,6 +9,8 @@ import {
   Diamond,
   LogOut,
   Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
   X,
   MessageSquare,
   MessageCircle,
@@ -26,11 +28,12 @@ const AppShell = () => {
   const { t } = useI18n();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarHidden, setDesktopSidebarHidden] = useState(false);
 
   // Mobile bottom nav items (only main navigation)
   const mobileNavItems = [
     { label: t("app.home"), icon: House, path: "/home" },
-    { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
+    { label: t("app.lessons"), icon: GraduationCap, path: "/bite-lessons" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
     { label: t("app.community"), icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
@@ -39,12 +42,12 @@ const AppShell = () => {
   // Sidebar / hamburger menu items (includes Profile and AI Chat)
   const sidebarNavItems = [
     { label: t("app.home"), icon: House, path: "/home" },
-    { label: "Lessons", icon: GraduationCap, path: "/bite-lessons" },
+    { label: t("app.lessons"), icon: GraduationCap, path: "/bite-lessons" },
     { label: t("app.learn"), icon: BookOpen, path: "/dashboard" },
     { label: t("app.community"), icon: MessageSquare, path: "/community" },
     { label: t("app.leaderboard"), icon: Trophy, path: "/leaderboard" },
     { label: t("app.profile"), icon: User, path: "/profile" },
-    { label: "AI Chat", icon: MessageCircle, path: "/chat" },
+    { label: t("app.aiChat"), icon: MessageCircle, path: "/chat" },
   ];
 
   // Only show floating button on /home page
@@ -53,7 +56,7 @@ const AppShell = () => {
   return (
     <div className="flex min-h-screen bg-background md:h-screen md:overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:h-screen md:w-72 md:shrink-0 md:flex-col md:overflow-hidden border-r border-sidebar-border/60 bg-[linear-gradient(180deg,hsl(var(--sidebar-background))_0%,hsl(var(--sidebar-background)/0.92)_100%)]">
+      {!desktopSidebarHidden && <aside className="hidden md:flex md:h-screen md:w-72 md:shrink-0 md:flex-col md:overflow-hidden border-r border-sidebar-border/60 bg-[linear-gradient(180deg,hsl(var(--sidebar-background))_0%,hsl(var(--sidebar-background)/0.92)_100%)]">
         <div className="flex items-center gap-2 border-b border-sidebar-border/70 px-6 py-5">
           <img
             src="/lingo_abyssinia_final.png"
@@ -95,7 +98,7 @@ const AppShell = () => {
             {t("app.logout")}
           </button>
         </div>
-      </aside>
+      </aside>}
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
@@ -119,6 +122,7 @@ const AppShell = () => {
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="text-sidebar-foreground"
+                aria-label={t("app.closeSidebar")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -156,10 +160,23 @@ const AppShell = () => {
       <div className="flex min-w-0 min-h-0 flex-1 flex-col">
         {/* Stats header */}
         <header className="flex items-center justify-between border-b border-border bg-card/70 px-3 py-3 backdrop-blur-sm sm:px-4 md:px-8">
-          <button className="md:hidden" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-6 w-6 text-foreground" />
-          </button>
           <div className="flex items-center gap-3 sm:gap-5">
+            <button className="md:hidden" onClick={() => setSidebarOpen(true)} aria-label={t("app.openSidebar")}>
+              <Menu className="h-6 w-6 text-foreground" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setDesktopSidebarHidden((hidden) => !hidden)}
+              className="hidden rounded-xl border border-border bg-background/70 p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:inline-flex"
+              aria-label={desktopSidebarHidden ? t("app.showSidebar") : t("app.hideSidebar")}
+              title={desktopSidebarHidden ? t("app.showSidebar") : t("app.hideSidebar")}
+            >
+              {desktopSidebarHidden ? (
+                <PanelLeftOpen className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
+            </button>
             <div className="flex items-center gap-1 text-xs font-medium sm:gap-1.5 sm:text-sm">
               <Flame className="h-5 w-5 text-accent" />
               <span>{user?.streak ?? 0}</span>
@@ -177,7 +194,7 @@ const AppShell = () => {
             <ThemeToggle iconOnly />
             <LanguageSwitcher iconOnly />
             <span className="text-sm text-muted-foreground">
-              {user?.name ?? "Learner"}
+              {user?.name ?? t("app.learner")}
             </span>
           </div>
         </header>

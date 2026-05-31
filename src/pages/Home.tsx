@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Home as HomeIcon,
@@ -98,6 +98,7 @@ const Home = () => {
     user?.selectedLanguage ?? "amharic",
   );
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [langLevel, setLangLevel] = useState<Level>("all");
   const [search, setSearch] = useState("");
 
@@ -130,8 +131,14 @@ const Home = () => {
       );
   }, [langLevel, search]);
 
-  const saveLanguage = () => {
-    updateUser({ selectedLanguage: selected });
+  useEffect(() => {
+    if (user?.selectedLanguage) setSelected(user.selectedLanguage);
+  }, [user?.selectedLanguage]);
+
+  const saveLanguage = async () => {
+    setSaving(true);
+    await updateUser({ selectedLanguage: selected });
+    setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
   };
@@ -265,9 +272,9 @@ const Home = () => {
 
         <div className="mt-4 flex flex-col gap-3 rounded-xl border border-border/60 bg-background/60 p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
-            <Button onClick={saveLanguage} size="sm" className="gap-2">
+            <Button onClick={saveLanguage} size="sm" className="gap-2" disabled={saving}>
               <Sparkles className="h-4 w-4" />
-              Save Language
+              {saving ? "Saving..." : "Save Language"}
             </Button>
             <span className="text-sm text-muted-foreground">
               Current: {languageLabel(user?.selectedLanguage ?? "amharic")}

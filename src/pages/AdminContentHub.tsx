@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { BookOpenCheck, MessageSquare, ShieldCheck, Trophy, Users } from "lucide-react";
+import { BookOpenCheck, CircleAlert, Library, MessageSquare, RefreshCw, ShieldCheck, Trophy, Users } from "lucide-react";
+import { AdminMetricCard, AdminPageHeader } from "@/components/admin/AdminDashboardUi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -78,23 +79,21 @@ const AdminContentHub = () => {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-secondary/10 to-background p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="font-display text-2xl font-bold md:text-4xl">Admin Control Hub</h1>
-            <p className="mt-2 text-sm text-muted-foreground">See users, community, leaderboard, lessons, quizzes, and content health in one place.</p>
-          </div>
-          <Button onClick={load} variant="secondary">Refresh data</Button>
-        </div>
-        {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
-      </div>
+      <AdminPageHeader
+        eyebrow="Unified operations"
+        title="Admin control hub"
+        description="Review users, community activity, leaderboard rankings, lessons, quizzes, and content health from one connected view."
+        icon={Library}
+        error={error}
+        actions={<Button onClick={load} variant="secondary"><RefreshCw className="mr-2 h-4 w-4" /> Refresh data</Button>}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card><CardHeader><CardTitle>Users</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{users.length}</p></CardContent></Card>
-        <Card><CardHeader><CardTitle>Community Posts</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{posts.length}</p></CardContent></Card>
-        <Card><CardHeader><CardTitle>Lessons</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{lessons.length}</p></CardContent></Card>
-        <Card><CardHeader><CardTitle>Quizzes</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{quizzes.length}</p></CardContent></Card>
-        <Card><CardHeader><CardTitle>Open Reports</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{posts.filter((p) => p.reports > 0).length}</p></CardContent></Card>
+        <AdminMetricCard label="Users" value={users.length} icon={Users} helper="Registered accounts" />
+        <AdminMetricCard label="Community" value={posts.length} icon={MessageSquare} helper="Learner posts" tone="secondary" />
+        <AdminMetricCard label="Lessons" value={lessons.length} icon={BookOpenCheck} helper="Course content" tone="emerald" />
+        <AdminMetricCard label="Quizzes" value={quizzes.length} icon={Library} helper="Knowledge checks" />
+        <AdminMetricCard label="Reported posts" value={posts.filter((post) => post.reports > 0).length} icon={CircleAlert} helper="Needs review" tone="accent" />
       </div>
 
       <Card>

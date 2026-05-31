@@ -32,8 +32,9 @@ Lingo Abyssinia Foundation is a React + Supabase language-learning app focused o
 3. Copy `.env.example` to `.env.local`.
 4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from Supabase Project Settings > API.
 5. In Supabase Auth URL Configuration, add `http://localhost:8080` as a site URL and redirect URL.
-6. If this project already existed before the latest RLS fixes, run `supabase/patches/2026-05-20-learning-rls.sql` in Supabase SQL Editor.
-7. Create an admin account with `admin@lingoabyssinia.com`, or update any user's `profiles.role` to `admin` in Supabase.
+6. Run `supabase/patches/2026-05-25-admin-quizzes.sql` in Supabase SQL Editor to enable admin-managed quizzes.
+7. If this project already existed before the latest RLS fixes, run `supabase/patches/2026-05-20-learning-rls.sql` in Supabase SQL Editor.
+8. Create an admin account with `admin@lingoabyssinia.com`, or update any user's `profiles.role` to `admin` in Supabase.
 
 
 ## ElevenLabs Voice Setup

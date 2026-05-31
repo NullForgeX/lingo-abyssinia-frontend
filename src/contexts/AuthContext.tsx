@@ -108,12 +108,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const setPreferences = useCallback(
     async (prefs: UserPreferences) => {
       if (!user) return;
+      setUser((prev) => prev ? { ...prev, selectedLanguage: prefs.language, dailyGoal: prefs.dailyGoal } : prev);
       try {
         const updated = await updatePreferences(user.id, prefs);
         setUser(updated);
       } catch (error) {
         console.error("Failed to persist preferences", error);
-        setUser((prev) => prev ? { ...prev, selectedLanguage: prefs.language, dailyGoal: prefs.dailyGoal } : prev);
       }
     },
     [user],
@@ -137,12 +137,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       >,
     ) => {
       if (!user) return;
+      setUser((prev) => prev ? { ...prev, ...updates } : prev);
       try {
         const updated = await updateProfile(user.id, updates);
         setUser(updated);
       } catch (error) {
         console.error("Failed to persist profile update", error);
-        setUser((prev) => prev ? { ...prev, ...updates } : prev);
       }
     },
     [user],

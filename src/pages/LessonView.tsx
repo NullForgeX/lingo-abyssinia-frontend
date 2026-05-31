@@ -22,7 +22,6 @@ const LessonView = () => {
   const currentIndex = lesson ? allLessons.findIndex((l) => l.id === lesson.id) : 0;
   const [itemIndex, setItemIndex] = useState(0);
   const [speakingKey, setSpeakingKey] = useState("");
-  const [voiceError, setVoiceError] = useState("");
 
   if (!lesson || !language || !isBiteLanguage(language)) {
     return (
@@ -48,12 +47,10 @@ const LessonView = () => {
   const speak = async (text: string, keySuffix: string) => {
     const key = `${lesson.id}-${keySuffix}`;
     setSpeakingKey(key);
-    setVoiceError("");
     try {
       await playElevenLabsSpeech(text);
     } catch (error) {
       console.error("Lesson voice playback failed; using browser fallback", error);
-      setVoiceError("Using browser voice fallback until ElevenLabs responds.");
       await speakWithBrowserFallback(text);
     } finally {
       setSpeakingKey("");
@@ -127,7 +124,9 @@ const LessonView = () => {
           className="rounded-3xl border border-border bg-background p-5 text-center sm:p-8"
         >
           <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">{activeItem.title}</p>
-          <p className="mt-3 text-lg text-muted-foreground">{activeItem.english}</p>
+          {activeItem.english !== activeItem.title && (
+            <p className="mt-3 text-lg text-muted-foreground">{activeItem.english}</p>
+          )}
           <h3 className="mt-2 font-display text-3xl font-black text-foreground md:text-5xl">
             {displayTarget(activeItem)}
           </h3>
@@ -164,7 +163,6 @@ const LessonView = () => {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          {voiceError && <p className="mt-3 text-xs text-muted-foreground">{voiceError}</p>}
         </motion.div>
 
         <div className="mt-5 rounded-2xl bg-primary/10 p-4 text-sm leading-6 text-foreground">
