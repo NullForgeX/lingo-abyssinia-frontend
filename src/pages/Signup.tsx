@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InteractiveGeezBackground from "@/components/InteractiveGeezBackground";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Eye, EyeOff } from "lucide-react";
 
 const schema = z
   .object({
@@ -20,10 +21,7 @@ const schema = z
     email: z.string().email("Please enter a valid email"),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Add at least one uppercase letter")
-      .regex(/[a-z]/, "Add at least one lowercase letter")
-      .regex(/[0-9]/, "Add at least one number"),
+      .min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((d) => d.password === d.confirmPassword, {
@@ -35,9 +33,9 @@ type FormData = z.infer<typeof schema>;
 
 const passwordRules = [
   { label: "At least 8 characters", test: (value: string) => value.length >= 8 },
-  { label: "One uppercase letter", test: (value: string) => /[A-Z]/.test(value) },
-  { label: "One lowercase letter", test: (value: string) => /[a-z]/.test(value) },
-  { label: "One number", test: (value: string) => /[0-9]/.test(value) },
+  { label: "One uppercase letter", test: (value: string) => /[A-Z]/.test(value), optional: true },
+  { label: "One lowercase letter", test: (value: string) => /[a-z]/.test(value), optional: true },
+  { label: "One number", test: (value: string) => /[0-9]/.test(value), optional: true },
   { label: "One symbol for extra strength", test: (value: string) => /[^A-Za-z0-9]/.test(value), optional: true },
 ];
 
@@ -50,6 +48,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -187,14 +187,24 @@ const Signup = () => {
             </div>
             <div>
               <Label htmlFor="password">{t("auth.password")}</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                {...register("password")}
-                className="mt-1.5"
-                placeholder="••••••••"
-              />
+              <div className="relative mt-1.5">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  {...register("password")}
+                  className="pr-11"
+                  placeholder="********"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground transition hover:text-foreground"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               <div className="mt-3 rounded-2xl border border-border/70 bg-background/70 p-3">
                 <div className="flex items-center justify-between text-xs font-semibold">
                   <span className="text-muted-foreground">Password strength</span>
@@ -227,14 +237,24 @@ const Signup = () => {
               <Label htmlFor="confirmPassword">
                 {t("auth.confirmPassword")}
               </Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                {...register("confirmPassword")}
-                className="mt-1.5"
-                placeholder="••••••••"
-              />
+              <div className="relative mt-1.5">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  {...register("confirmPassword")}
+                  className="pr-11"
+                  placeholder="********"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((visible) => !visible)}
+                  className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground transition hover:text-foreground"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-destructive">
                   {errors.confirmPassword.message}

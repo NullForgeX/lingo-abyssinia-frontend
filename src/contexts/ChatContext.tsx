@@ -42,7 +42,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     (user?.selectedLanguage as SupportedLanguage) || "amharic",
   );
   const [level, setLevel] = useState<LanguageLevel>("beginner");
-  const [scenario, setScenario] = useState<ConversationScenario>("greetings");
+  const [scenario, setScenario] = useState<ConversationScenario>("free");
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(

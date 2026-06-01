@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getCourse } from "@/data/courseContent";
+import { getCourse, Lesson } from "@/data/courseContent";
 import { useNavigate } from "react-router-dom";
 import { Lock, CheckCircle2, PlayCircle, Star, Route, ArrowRight } from "lucide-react";
 import { useLessonProgress } from "@/hooks/useLessonProgress";
 import { useI18n } from "@/contexts/I18nContext";
+import { getPublishedAdminLessons } from "@/api/adminPublishedContent";
 
 const CourseRoadmap = () => {
   const { user } = useAuth();
@@ -12,6 +14,7 @@ const CourseRoadmap = () => {
   const navigate = useNavigate();
   const { completedLessons } = useLessonProgress();
   const course = getCourse(user?.selectedLanguage || "amharic");
+  const [adminLessons, setAdminLessons] = useState<Lesson[]>([]);
 
   const langLabels = {
     amharic: "Amharic",
@@ -20,12 +23,39 @@ const CourseRoadmap = () => {
   };
   const langName = user?.selectedLanguage ? langLabels[user.selectedLanguage] : "Amharic";
 
-  const allLessons = course.units.flatMap((u) => u.lessons);
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAdminLessons = async () => {
+      const lessons = await getPublishedAdminLessons(user?.selectedLanguage || "amharic");
+      if (!cancelled) setAdminLessons(lessons);
+    };
+
+    loadAdminLessons();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.selectedLanguage]);
+
+  const displayUnits = adminLessons.length > 0
+    ? [
+        ...course.units,
+        {
+          id: `${course.language}-admin-created`,
+          title: "Admin-created practice",
+          description: "Published lessons and practice questions created by your admin team.",
+          lessons: adminLessons,
+        },
+      ]
+    : course.units;
+
+  const allLessons = displayUnits.flatMap((u) => u.lessons);
 
   const getStatus = (lessonId: string): "completed" | "active" | "locked" => {
     if (completedLessons.includes(lessonId)) return "completed";
 
-    const unit = course.units.find((courseUnit) =>
+    const unit = displayUnits.find((courseUnit) =>
       courseUnit.lessons.some((lesson) => lesson.id === lessonId),
     );
     const unitLessonIndex = unit?.lessons.findIndex((lesson) => lesson.id === lessonId) ?? -1;
@@ -69,7 +99,7 @@ const CourseRoadmap = () => {
       </motion.div>
 
       <div className="mt-8 space-y-6">
-        {course.units.map((unit, unitIdx) => (
+        {displayUnits.map((unit, unitIdx) => (
           <motion.section
             key={unit.id}
             initial={{ opacity: 0, y: 14 }}

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BellRing, Lightbulb, MessageCircleReply, MessageSquareQuote, Search, Send, ShieldAlert, ThumbsUp, TriangleAlert, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePresence } from "@/contexts/PresenceContext";
 import { CommunityPost, PostType, createCommunityPost, createCommunityReply, getCommunityPosts, reportCommunityPost, updateCommunityPostStatus, likeCommunityPost } from "@/api/community";
 
 type NotificationItem = {
@@ -28,6 +29,7 @@ const typeMeta: Record<PostType, { label: string; icon: typeof MessageSquareQuot
 
 const CommunityForum = () => {
   const { user } = useAuth();
+  const { activeLearners } = usePresence();
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState("");
   const [draftType, setDraftType] = useState<PostType>("question");
@@ -57,10 +59,10 @@ const CommunityForum = () => {
   }, []);
 
   const stats = useMemo(() => [
-    { label: "Active learners", value: "Live" },
+    { label: "Active learners", value: `${Math.max(activeLearners, user ? 1 : 0)}` },
     { label: "Open threads", value: `${posts.filter((p) => p.status === "open").length}` },
     { label: "Resolved", value: `${posts.filter((p) => p.status === "resolved").length}` },
-  ], [posts]);
+  ], [activeLearners, posts, user]);
 
   const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase();

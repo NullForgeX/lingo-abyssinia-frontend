@@ -5,11 +5,11 @@ Lingo Abyssinia Foundation is a React + Supabase language-learning app focused o
 ## What It Does
 
 - Supports Amharic, Afan Oromoo, and Tigrinya learning paths
-- Registers and logs in users with Supabase Auth
-- Creates learner profiles automatically in Supabase
+- Registers and logs in users 
+- Creates learner profiles 
 - Supports admin users through the `profiles.role` field
 - Persists onboarding preferences, profile updates, and lesson completion
-- Stores community posts, replies, and moderation reports in Supabase
+- Stores community posts, replies, and moderation reports 
 - Provides admin views for lessons, users, reports, analytics, and audit logs
 
 ## Tech Stack
@@ -17,7 +17,6 @@ Lingo Abyssinia Foundation is a React + Supabase language-learning app focused o
 - React 18
 - TypeScript
 - Vite
-- Supabase Auth + Postgres + Row Level Security
 - React Router
 - Tailwind CSS
 - Radix UI / shadcn-style components
@@ -25,16 +24,6 @@ Lingo Abyssinia Foundation is a React + Supabase language-learning app focused o
 - React Hook Form + Zod
 - Vitest
 
-## Supabase Setup
-
-1. Create a Supabase project.
-2. Open the Supabase SQL editor and run `supabase/schema.sql`.
-3. Copy `.env.example` to `.env.local`.
-4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from Supabase Project Settings > API.
-5. In Supabase Auth URL Configuration, add `http://localhost:8080` as a site URL and redirect URL.
-6. Run `supabase/patches/2026-05-25-admin-quizzes.sql` in Supabase SQL Editor to enable admin-managed quizzes.
-7. If this project already existed before the latest RLS fixes, run `supabase/patches/2026-05-20-learning-rls.sql` in Supabase SQL Editor.
-8. Create an admin account with `admin@lingoabyssinia.com`, or update any user's `profiles.role` to `admin` in Supabase.
 
 
 ## ElevenLabs Voice Setup
@@ -132,13 +121,6 @@ npm run lint
 ```bash
 npm run test
 ```
-
-## Current Architecture Notes
-
-- Supabase is now the backend for auth, profiles, progress, community, moderation, admin lessons, and audit logs
-- Lesson exercise content is still hardcoded in `src/data/courseContent.ts`
-- Theme and UI language preferences still use browser `localStorage`
-- Admin role changes are stored in `profiles.role` and protected by RLS policies
 
 
 

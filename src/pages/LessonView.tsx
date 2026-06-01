@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { BookOpenCheck, CheckCircle2, ChevronLeft, ChevronRight, Headphones, Home, Volume2 } from "lucide-react";
 import { biteLessons, biteLanguageNames, BiteLanguage, BiteLesson, BiteLessonItem } from "@/data/biteLessons";
 import { Button } from "@/components/ui/button";
-import { playElevenLabsSpeech, speakWithBrowserFallback } from "@/api/voice";
+import { playAppSpeech } from "@/api/voice";
 import { useNavigate, useParams } from "react-router-dom";
 
 const isBiteLanguage = (language?: string): language is BiteLanguage =>
@@ -48,10 +48,7 @@ const LessonView = () => {
     const key = `${lesson.id}-${keySuffix}`;
     setSpeakingKey(key);
     try {
-      await playElevenLabsSpeech(text);
-    } catch (error) {
-      console.error("Lesson voice playback failed; using browser fallback", error);
-      await speakWithBrowserFallback(text);
+      await playAppSpeech(text, { language });
     } finally {
       setSpeakingKey("");
     }

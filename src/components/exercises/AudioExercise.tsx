@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Volume2, CheckCircle2, XCircle } from "lucide-react";
 import { Exercise } from "@/data/courseContent";
-import { playElevenLabsSpeech, speakWithBrowserFallback } from "@/api/voice";
+import { playAppSpeech } from "@/api/voice";
 
 interface Props {
   exercise: Exercise;
@@ -19,10 +19,7 @@ const AudioExercise = ({ exercise, onAnswer }: Props) => {
     setSpeaking(true);
 
     try {
-      await playElevenLabsSpeech(exercise.audioText);
-    } catch (error) {
-      console.error("ElevenLabs playback failed; using browser speech fallback", error);
-      await speakWithBrowserFallback(exercise.audioText);
+      await playAppSpeech(exercise.audioText);
     } finally {
       setSpeaking(false);
     }

@@ -64,6 +64,7 @@ function buildSystemPrompt(
   language: SupportedLanguage,
   level: LanguageLevel,
   scenario: ConversationScenario,
+  isFirstAssistantReply: boolean,
 ): string {
   const langName = LANGUAGE_NAMES[language];
   const scenarioDesc = SCENARIO_PROMPTS[scenario];
@@ -84,10 +85,12 @@ CONTEXT:
 - Practice scenario: ${scenarioDesc}
 - Default language: ${langName} (always use this unless the user explicitly asks for English)
 - User's selected language is ${langName} - always respond in this language first
+- This is ${isFirstAssistantReply ? "the first assistant reply in the conversation" : "not the first assistant reply in the conversation"}
 
 CRITICAL RULES - ALWAYS FOLLOW THESE:
 1. When a user asks ANY question or says ANYTHING, you MUST respond in ${langName} FIRST, then briefly explain in English if needed. NEVER default to English-only answers.
 2. NEVER use markdown formatting like asterisks (*), hashes (#), or bullet points. Use plain text only.
+3. Use a greeting like "selam", "nagaa", or "hello" ONLY on the first assistant reply. After that, do not start replies with greetings unless the user specifically asks to practice greetings.
 
 EXAMPLES:
 - If user asks "how are you?" → Respond in ${langName}, give the phrase for "I am fine" in ${langName}
@@ -98,7 +101,7 @@ EXAMPLES:
 YOUR STYLE:
 - ${levelInstructions[level]}
 - Be warm, encouraging, and culturally aware
-- ALWAYS start conversations in ${langName} with a greeting
+- Start only the first reply with a short greeting in ${langName}; later replies should answer directly and naturally
 - When teaching vocabulary, show the word in ${langName} script first, then explain
 - Keep responses conversational (not too long)
 - Use a mix of dialogue and brief teaching moments
@@ -111,7 +114,7 @@ FORMAT:
 - Use plain text only. No asterisks, no bullet points, no markdown. Separate items with line breaks.
 - If you need to explain grammar or culture, do so briefly in English AFTER the ${langName} content
 
-Remember: You are a ${langName} tutor. Respond in ${langName} as the default! Use NO markdown formatting!`;
+Remember: You are a ${langName} tutor. Respond in ${langName} as the default! Use NO markdown formatting! Avoid repeated greeting openers after the first reply.`;
 }
 
 export async function sendGeminiMessage(
@@ -127,7 +130,8 @@ export async function sendGeminiMessage(
     );
   }
 
-  const systemPrompt = buildSystemPrompt(language, level, scenario);
+  const isFirstAssistantReply = !messages.some((message) => message.role === "model");
+  const systemPrompt = buildSystemPrompt(language, level, scenario, isFirstAssistantReply);
 
   // Build conversation history for Gemini
   // Gemini expects alternating user/model messages

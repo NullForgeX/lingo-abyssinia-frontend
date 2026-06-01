@@ -2,6 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 
+export type LessonProgressRecord = {
+  lessonId: string;
+  completedAt: string;
+  xpEarned: number;
+};
+
 const progressKey = (userId: string) => `lingo_completed_lessons_${userId}`;
 const PROGRESS_EVENT = "lingo:lesson-progress";
 
@@ -24,10 +30,12 @@ const writeCachedProgress = (userId: string, lessons: string[]) => {
 export function useLessonProgress() {
   const { user, updateUser } = useAuth();
   const [completedLessons, setCompleted] = useState<string[]>([]);
+  const [progressRecords, setProgressRecords] = useState<LessonProgressRecord[]>([]);
 
   useEffect(() => {
     if (!user) {
       setCompleted([]);
+      setProgressRecords([]);
       return;
     }
 
@@ -51,7 +59,7 @@ export function useLessonProgress() {
       const cached = readCachedProgress(user.id);
       const { data, error } = await supabase
         .from("lesson_progress")
-        .select("lesson_id")
+        .select("lesson_id,completed_at,xp_earned")
         .eq("user_id", user.id);
 
       if (cancelled) return;
@@ -62,10 +70,16 @@ export function useLessonProgress() {
         return;
       }
 
-      const remote = (data || []).map((row) => row.lesson_id as string);
+      const records = (data || []).map((row) => ({
+        lessonId: row.lesson_id as string,
+        completedAt: (row.completed_at as string | null) || new Date().toISOString(),
+        xpEarned: Number(row.xp_earned || 0),
+      }));
+      const remote = records.map((row) => row.lessonId);
       const merged = Array.from(new Set([...cached, ...remote]));
       writeCachedProgress(user.id, merged);
       setCompleted(merged);
+      setProgressRecords(records);
     };
 
     loadProgress();
@@ -82,8 +96,13 @@ export function useLessonProgress() {
       const previousCompleted = readCachedProgress(user.id);
       const alreadyCompleted = previousCompleted.includes(lessonId);
       const nextCompleted = Array.from(new Set([...previousCompleted, lessonId]));
+      const completedAt = new Date().toISOString();
       writeCachedProgress(user.id, nextCompleted);
       setCompleted(nextCompleted);
+      setProgressRecords((current) => {
+        if (current.some((record) => record.lessonId === lessonId)) return current;
+        return [...current, { lessonId, completedAt, xpEarned }];
+      });
 
       if (!alreadyCompleted) {
         await updateUser({
@@ -97,7 +116,7 @@ export function useLessonProgress() {
           user_id: user.id,
           lesson_id: lessonId,
           xp_earned: xpEarned,
-          completed_at: new Date().toISOString(),
+          completed_at: completedAt,
         },
         { onConflict: "user_id,lesson_id" },
       );
@@ -107,5 +126,5 @@ export function useLessonProgress() {
     [user, updateUser],
   );
 
-  return { completedLessons, markComplete };
+  return { completedLessons, progressRecords, markComplete };
 }

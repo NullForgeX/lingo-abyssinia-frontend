@@ -27,6 +27,11 @@ import {
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { getCourse } from "@/data/courseContent";
+import {
+  buildProgressBadges,
+  buildSkillScores,
+  buildStreakHistory,
+} from "@/lib/progressInsights";
 
 const languages = [
   {
@@ -61,15 +66,6 @@ const languages = [
 const levels = ["all", "beginner", "intermediate", "advanced"] as const;
 type Level = (typeof levels)[number];
 
-// Skill chart data - in production this would come from user progress
-const skillData = [
-  { skill: "Vocabulary", score: 74 },
-  { skill: "Reading", score: 62 },
-  { skill: "Listening", score: 57 },
-  { skill: "Writing", score: 69 },
-  { skill: "Speaking", score: 54 },
-];
-
 const chartConfig: ChartConfig = {
   score: {
     label: "Score",
@@ -77,21 +73,26 @@ const chartConfig: ChartConfig = {
   },
 };
 
-// Sample badges - in production this would come from user data
-const badges = [
-  { id: "b1", name: "First Lesson", description: "Complete your first lesson", earnedAt: "2026-04-12" },
-  { id: "b2", name: "7-Day Streak", description: "Practice for 7 days", earnedAt: "2026-04-21" },
-  { id: "b3", name: "Vocabulary Starter", description: "Learn 50 words", earnedAt: "2026-05-02" },
-  { id: "b4", name: "Quiz Master", description: "Score 90% on 5 quizzes", earnedAt: "2026-05-07" },
-];
-
 const Home = () => {
   const { user, updateUser } = useAuth();
   const { t, languageLabel } = useI18n();
-  const { completedLessons } = useLessonProgress();
+  const { completedLessons, progressRecords } = useLessonProgress();
   const course = getCourse(user?.selectedLanguage ?? "amharic");
   const totalLessons = course?.units?.flatMap((u: { lessons: unknown[] }) => u.lessons).length ?? 0;
   const completion = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
+  const currentStreak = user?.streak ?? 0;
+  const streakHistory = useMemo(
+    () => buildStreakHistory(progressRecords, currentStreak),
+    [progressRecords, currentStreak],
+  );
+  const badges = useMemo(
+    () => buildProgressBadges(progressRecords, currentStreak, totalLessons),
+    [progressRecords, currentStreak, totalLessons],
+  );
+  const skillData = useMemo(
+    () => buildSkillScores(course, completedLessons),
+    [course, completedLessons],
+  );
 
   // Language selection state
   const [selected, setSelected] = useState<"amharic" | "oromo" | "tigrinya">(
@@ -101,24 +102,6 @@ const Home = () => {
   const [saving, setSaving] = useState(false);
   const [langLevel, setLangLevel] = useState<Level>("all");
   const [search, setSearch] = useState("");
-
-  // Streak history state
-  const currentStreak = user?.streak ?? 0;
-  const streakHistory = useMemo(
-    () =>
-      Array.from({ length: 14 }, (_, i) => {
-        const daysAgo = 13 - i;
-        const date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-        const active = i > Math.max(0, 13 - currentStreak);
-        return {
-          key: date.toISOString(),
-          label: date.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-          active,
-        };
-      }),
-    [currentStreak],
-  );
 
   const visibleLanguages = useMemo(() => {
     return languages
@@ -326,7 +309,7 @@ const Home = () => {
         </div>
         <p className="mb-4 text-sm text-muted-foreground">{t("home.badgeHistoryDesc")}</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          {badges.map((badge) => (
+          {badges.slice(0, 4).map((badge) => (
             <div key={badge.id} className="rounded-lg border border-border/60 bg-background/60 px-4 py-3">
               <p className="font-semibold text-foreground">{badge.name}</p>
               <p className="mt-0.5 text-sm text-muted-foreground">{badge.description}</p>
@@ -335,6 +318,11 @@ const Home = () => {
               </p>
             </div>
           ))}
+          {badges.length === 0 && (
+            <div className="rounded-lg border border-dashed border-border bg-background/60 px-4 py-6 text-sm text-muted-foreground sm:col-span-2">
+              Complete your first lesson to earn your first badge.
+            </div>
+          )}
         </div>
       </motion.section>
 

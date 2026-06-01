@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Trash2, Sparkles, Loader2, X, Settings2, MessageCircle } from "lucide-react";
+import { Send, Trash2, Sparkles, Loader2, Settings2, MessageCircle, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { useChat } from "@/contexts/ChatContext";
 import { useI18n } from "@/contexts/I18nContext";
 import { SCENARIOS, LEVELS, SupportedLanguage } from "@/api/gemini";
-import { speakWithBrowserFallback } from "@/api/voice";
+import { pauseAppSpeech, playAppSpeech, resumeAppSpeech, stopAppSpeech } from "@/api/voice";
 
 const LANGUAGE_OPTIONS: { value: SupportedLanguage; label: string; flag: string }[] = [
   { value: "amharic", label: "Amharic", flag: "አ" },
@@ -18,8 +18,25 @@ const LANGUAGE_OPTIONS: { value: SupportedLanguage; label: string; flag: string 
   { value: "tigrinya", label: "Tigrinya", flag: "ት" },
 ];
 
-const ChatMessageBubble = ({ message, onSpeak }: { message: { content: string; role: string }; onSpeak: (text: string) => void }) => {
+type AudioState = "idle" | "loading" | "playing" | "paused";
+
+const ChatMessageBubble = ({
+  message,
+  audioState,
+  onSpeak,
+  onPause,
+  onResume,
+  onStop,
+}: {
+  message: { id: string; content: string; role: string };
+  audioState: AudioState;
+  onSpeak: (messageId: string, text: string) => void;
+  onPause: () => void;
+  onResume: () => void;
+  onStop: () => void;
+}) => {
   const isUser = message.role === "user";
+  const isActive = audioState !== "idle";
 
   return (
     <motion.div
@@ -45,13 +62,37 @@ const ChatMessageBubble = ({ message, onSpeak }: { message: { content: string; r
         )}
         <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
         {!isUser && (
-          <button
-            onClick={() => onSpeak(message.content)}
-            className="mt-2 flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-primary/20"
-          >
-            <MessageCircle className="h-3 w-3" />
-            Listen
-          </button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {audioState === "paused" ? (
+              <button
+                onClick={onResume}
+                className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-primary/20"
+              >
+                <Play className="h-3 w-3" />
+                Resume
+              </button>
+            ) : (
+              <button
+                onClick={() => (isActive ? onPause() : onSpeak(message.id, message.content))}
+                disabled={audioState === "loading"}
+                className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-primary/20 disabled:opacity-60"
+              >
+                {audioState === "loading" && <Loader2 className="h-3 w-3 animate-spin" />}
+                {audioState === "playing" && <Pause className="h-3 w-3" />}
+                {audioState === "idle" && <MessageCircle className="h-3 w-3" />}
+                {audioState === "loading" ? "Loading audio" : audioState === "playing" ? "Pause" : "Listen"}
+              </button>
+            )}
+            {isActive && (
+              <button
+                onClick={onStop}
+                className="flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
+              >
+                <Square className="h-3 w-3" />
+                Stop
+              </button>
+            )}
+          </div>
         )}
       </div>
     </motion.div>
@@ -76,6 +117,8 @@ const Chat = () => {
 
   const [input, setInput] = useState("");
   const [showSettings, setShowSettings] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [audioState, setAudioState] = useState<AudioState>("idle");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -98,10 +141,34 @@ const Chat = () => {
     await sendMessage(messageText);
   };
 
-  const handleSpeak = (text: string) => {
-    // Extract just the target language text (skip explanations)
-    // For now, speak the whole message
-    speakWithBrowserFallback(text);
+  const handleSpeak = async (messageId: string, text: string) => {
+    stopAppSpeech();
+    setSpeakingMessageId(messageId);
+    setAudioState("loading");
+
+    await playAppSpeech(text, {
+      language,
+      useElevenLabsFallback: false,
+      chunkLongText: true,
+      onPlaybackStart: () => setAudioState("playing"),
+    });
+
+    setSpeakingMessageId((current) => (current === messageId ? null : current));
+    setAudioState((current) => (current === "paused" ? current : "idle"));
+  };
+
+  const handlePause = () => {
+    if (pauseAppSpeech()) setAudioState("paused");
+  };
+
+  const handleResume = async () => {
+    if (await resumeAppSpeech()) setAudioState("playing");
+  };
+
+  const handleStop = () => {
+    stopAppSpeech();
+    setSpeakingMessageId(null);
+    setAudioState("idle");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -272,7 +339,11 @@ const Chat = () => {
                 <ChatMessageBubble
                   key={msg.id}
                   message={msg}
+                  audioState={speakingMessageId === msg.id ? audioState : "idle"}
                   onSpeak={handleSpeak}
+                  onPause={handlePause}
+                  onResume={handleResume}
+                  onStop={handleStop}
                 />
               ))}
             </AnimatePresence>

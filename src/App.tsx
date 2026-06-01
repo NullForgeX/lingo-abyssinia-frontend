@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { PresenceProvider } from "@/contexts/PresenceContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppShell from "./components/AppShell";
 import AdminShell from "./components/AdminShell";
@@ -23,9 +24,9 @@ import BadgeHistory from "./pages/BadgeHistory";
 import SkillProgress from "./pages/SkillProgress";
 import BiteLessons from "./pages/BiteLessons";
 import LessonView from "./pages/LessonView";
+import Login from "./pages/Login";
 
 const Landing = lazy(() => import("./pages/Landing"));
-const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -52,7 +53,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ScrollToTop />
-              <Suspense fallback={null}>
+              <Suspense fallback={<div className="min-h-screen bg-background" />}>
                 <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
@@ -71,7 +72,9 @@ const App = () => (
                   element={
                     <ProtectedRoute allowRoles={["learner"]}>
                       <ChatProvider>
-                        <AppShell />
+                        <PresenceProvider>
+                          <AppShell />
+                        </PresenceProvider>
                       </ChatProvider>
                     </ProtectedRoute>
                   }

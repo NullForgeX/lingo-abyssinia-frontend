@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLesson, getNextLesson } from "@/data/courseContent";
+import { getLesson, getNextLesson, Lesson } from "@/data/courseContent";
+import { getPublishedAdminLesson } from "@/api/adminPublishedContent";
 import { Progress } from "@/components/ui/progress";
 import MultipleChoice from "@/components/exercises/MultipleChoice";
 import TranslationExercise from "@/components/exercises/TranslationExercise";
@@ -19,10 +20,12 @@ const LessonPlayer = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const lesson = useMemo(
+  const staticLesson = useMemo(
     () => getLesson(user?.selectedLanguage || "amharic", lessonId || ""),
     [user?.selectedLanguage, lessonId],
   );
+  const [adminLesson, setAdminLesson] = useState<Lesson | undefined>();
+  const lesson = staticLesson || adminLesson;
 
   const nextLesson = useMemo(
     () => getNextLesson(user?.selectedLanguage || "amharic", lessonId || ""),
@@ -33,6 +36,27 @@ const LessonPlayer = () => {
   const [hearts, setHearts] = useState(MAX_HEARTS);
   const [correctCount, setCorrectCount] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setAdminLesson(undefined);
+    setCurrentIdx(0);
+    setHearts(MAX_HEARTS);
+    setCorrectCount(0);
+    setAnswers([]);
+
+    const loadAdminLesson = async () => {
+      if (!lessonId || !lessonId.startsWith("admin-") || staticLesson) return;
+      const loaded = await getPublishedAdminLesson(user?.selectedLanguage || "amharic", lessonId);
+      if (!cancelled) setAdminLesson(loaded);
+    };
+
+    loadAdminLesson();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lessonId, staticLesson, user?.selectedLanguage]);
 
   if (!lesson) {
     return (
