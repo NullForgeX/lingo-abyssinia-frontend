@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
@@ -7,14 +8,10 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const chartData = [
-  { skill: "Vocabulary", score: 74 },
-  { skill: "Reading", score: 62 },
-  { skill: "Listening", score: 57 },
-  { skill: "Writing", score: 69 },
-  { skill: "Speaking", score: 54 },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { getCourse } from "@/data/courseContent";
+import { useLessonProgress } from "@/hooks/useLessonProgress";
+import { buildSkillScores } from "@/lib/progressInsights";
 
 const chartConfig: ChartConfig = {
   score: {
@@ -24,6 +21,14 @@ const chartConfig: ChartConfig = {
 };
 
 const SkillProgress = () => {
+  const { user } = useAuth();
+  const { completedLessons } = useLessonProgress();
+  const course = getCourse(user?.selectedLanguage ?? "amharic");
+  const chartData = useMemo(
+    () => buildSkillScores(course, completedLessons),
+    [course, completedLessons],
+  );
+
   return (
     <div className="mx-auto max-w-5xl pb-20 md:pb-0">
       <div className="flex items-center justify-between">

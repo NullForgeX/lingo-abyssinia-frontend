@@ -1,26 +1,18 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLessonProgress } from "@/hooks/useLessonProgress";
+import { buildStreakHistory } from "@/lib/progressInsights";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const StreakHistory = () => {
   const { user } = useAuth();
+  const { progressRecords } = useLessonProgress();
   const currentStreak = user?.streak ?? 0;
 
   const history = useMemo(
-    () =>
-      Array.from({ length: 14 }, (_, i) => {
-        const daysAgo = 13 - i;
-        const date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-        const active = i > Math.max(0, 13 - currentStreak);
-        return {
-          key: date.toISOString(),
-          label: date.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-          active,
-        };
-      }),
-    [currentStreak],
+    () => buildStreakHistory(progressRecords, currentStreak),
+    [progressRecords, currentStreak],
   );
 
   return (

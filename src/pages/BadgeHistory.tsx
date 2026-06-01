@@ -1,14 +1,21 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const badges = [
-  { id: "b1", name: "First Lesson", description: "Complete your first lesson", earnedAt: "2026-04-12" },
-  { id: "b2", name: "7-Day Streak", description: "Practice for 7 days", earnedAt: "2026-04-21" },
-  { id: "b3", name: "Vocabulary Starter", description: "Learn 50 words", earnedAt: "2026-05-02" },
-  { id: "b4", name: "Quiz Master", description: "Score 90% on 5 quizzes", earnedAt: "2026-05-07" },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { getCourse } from "@/data/courseContent";
+import { useLessonProgress } from "@/hooks/useLessonProgress";
+import { buildProgressBadges } from "@/lib/progressInsights";
 
 const BadgeHistory = () => {
+  const { user } = useAuth();
+  const { progressRecords } = useLessonProgress();
+  const course = getCourse(user?.selectedLanguage ?? "amharic");
+  const totalLessons = course.units.flatMap((unit) => unit.lessons).length;
+  const badges = useMemo(
+    () => buildProgressBadges(progressRecords, user?.streak ?? 0, totalLessons),
+    [progressRecords, user?.streak, totalLessons],
+  );
+
   return (
     <div className="mx-auto max-w-4xl pb-20 md:pb-0">
       <div className="flex items-center justify-between">
@@ -32,6 +39,11 @@ const BadgeHistory = () => {
               </p>
             </div>
           ))}
+          {badges.length === 0 && (
+            <div className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+              No badges earned yet. Complete a lesson to unlock your first badge.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

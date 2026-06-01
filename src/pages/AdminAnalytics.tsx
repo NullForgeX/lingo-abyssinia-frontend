@@ -1,5 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { BarChart3, BookOpenCheck, Target, Users } from "lucide-react";
+import { AdminMetricCard, AdminPageHeader } from "@/components/admin/AdminDashboardUi";
 import { getAdminLessons, getAdminUsersActivity } from "@/data/adminStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
@@ -68,26 +70,26 @@ const AdminAnalytics = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold md:text-3xl">Analytics</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Platform performance, content health, and user engagement trends.</p>
-          {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
-        </div>
-        <select aria-label="Analytics range" value={range} onChange={(e) => setRange(e.target.value as "7d" | "30d")} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+      <AdminPageHeader
+        eyebrow="Performance insights"
+        title="Analytics"
+        description="Track platform performance, content health, and learner engagement trends."
+        icon={BarChart3}
+        error={error}
+        actions={<select aria-label="Analytics range" value={range} onChange={(e) => setRange(e.target.value as "7d" | "30d")} className="h-10 rounded-xl border border-input bg-background px-3 text-sm">
           <option value="7d">Last 7 days</option>
           <option value="30d">Last 30 days</option>
-        </select>
-      </div>
+        </select>}
+      />
 
       {loading ? (
         <div className="mt-6 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Loading analytics...</div>
       ) : (
         <>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <Card><CardHeader><CardTitle>Total Users</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{users.length}</p></CardContent></Card>
-            <Card><CardHeader><CardTitle>Published Lessons</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">{published}</p></CardContent></Card>
-            <Card><CardHeader><CardTitle>Completion Rate</CardTitle></CardHeader><CardContent><p className="font-display text-3xl font-bold">76%</p></CardContent></Card>
+            <AdminMetricCard label="Total users" value={users.length} icon={Users} helper="Registered learners and admins" />
+            <AdminMetricCard label="Published lessons" value={published} icon={BookOpenCheck} helper="Visible in learner app" tone="emerald" />
+            <AdminMetricCard label="Completion rate" value="76%" icon={Target} helper="Current learner benchmark" tone="secondary" />
           </div>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-2">

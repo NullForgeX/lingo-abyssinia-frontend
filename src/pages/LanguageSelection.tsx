@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,11 +47,18 @@ const LanguageSelection = () => {
   const { languageLabel } = useI18n();
   const [selected, setSelected] = useState<"amharic" | "oromo" | "tigrinya">(user?.selectedLanguage ?? "amharic");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [level, setLevel] = useState<Level>("all");
   const [search, setSearch] = useState("");
 
-  const saveLanguage = () => {
-    updateUser({ selectedLanguage: selected });
+  useEffect(() => {
+    if (user?.selectedLanguage) setSelected(user.selectedLanguage);
+  }, [user?.selectedLanguage]);
+
+  const saveLanguage = async () => {
+    setSaving(true);
+    await updateUser({ selectedLanguage: selected });
+    setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
   };
@@ -116,7 +123,7 @@ const LanguageSelection = () => {
       </div>
 
       <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-border bg-card/90 p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
-        <Button onClick={saveLanguage} className="w-full gap-2 sm:w-auto"><Sparkles className="h-4 w-4" /> Save Language</Button>
+        <Button onClick={saveLanguage} className="w-full gap-2 sm:w-auto" disabled={saving}><Sparkles className="h-4 w-4" /> {saving ? "Saving..." : "Save Language"}</Button>
         <p className="text-sm text-muted-foreground">Current: {languageLabel(user?.selectedLanguage ?? "amharic")}</p>
       </div>
 

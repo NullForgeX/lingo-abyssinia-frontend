@@ -152,17 +152,6 @@ const Landing = () => {
           style={{ y: heroY, opacity: heroOpacity }}
           className="relative z-10 mx-auto max-w-5xl px-6 text-center"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="mb-6 flex items-center justify-center"
-          >
-            <div className="rounded-full border border-primary-foreground/40 bg-primary-foreground/15 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-primary-foreground backdrop-blur-sm">
-              Ethiopian Language Studio
-            </div>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

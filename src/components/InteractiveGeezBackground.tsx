@@ -1,5 +1,5 @@
-import { useMemo, useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 const GEEZ_CODES = [
   0x1200, 0x1208, 0x1210, 0x1218, 0x1220, 0x1228, 0x1230, 0x1240,
@@ -15,11 +15,8 @@ interface CharData {
   y: number;
   size: number;
   baseOpacity: number;
-  duration: number;
-  delay: number;
-  driftX: number;
-  driftY: number;
-  rotate: number;
+  speed: number;
+  offset: number;
 }
 
 function generateChars(count: number): CharData[] {
@@ -29,11 +26,8 @@ function generateChars(count: number): CharData[] {
     y: Math.random() * 100,
     size: 1.4 + Math.random() * 3.2,
     baseOpacity: 0.07 + Math.random() * 0.09,
-    duration: 7 + Math.random() * 7,
-    delay: Math.random() * -12,
-    driftX: -18 + Math.random() * 36,
-    driftY: -22 + Math.random() * 44,
-    rotate: -14 + Math.random() * 28,
+    speed: 3 + Math.random() * 4.5,
+    offset: Math.random() * Math.PI * 2,
   }));
 }
 
@@ -47,18 +41,19 @@ const InteractiveGeezBackground = ({ count = 30, className = "" }: Props) => {
   const chars = useMemo(() => generateChars(count), [count]);
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
-  const smoothX = useSpring(mouseX, { stiffness: 55, damping: 24, mass: 0.4 });
-  const smoothY = useSpring(mouseY, { stiffness: 55, damping: 24, mass: 0.4 });
-  const parallaxX = useTransform(smoothX, [0, 1], [18, -18]);
-  const parallaxY = useTransform(smoothY, [0, 1], [12, -12]);
+  const smoothX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "touch") return;
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    mouseX.set((event.clientX - rect.left) / rect.width);
-    mouseY.set((event.clientY - rect.top) / rect.height);
-  };
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === "touch") return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      mouseX.set((event.clientX - rect.left) / rect.width);
+      mouseY.set((event.clientY - rect.top) / rect.height);
+    },
+    [mouseX, mouseY],
+  );
 
   return (
     <div
@@ -78,38 +73,74 @@ const InteractiveGeezBackground = ({ count = 30, className = "" }: Props) => {
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <motion.div className="absolute inset-0 pointer-events-none" style={{ x: parallaxX, y: parallaxY }}>
-        {chars.map((charData, index) => (
-          <GeezChar key={`${charData.char}-${index}`} data={charData} />
-        ))}
-      </motion.div>
+      {chars.map((charData, index) => (
+        <GeezChar
+          key={`${charData.char}-${index}`}
+          data={charData}
+          index={index}
+          mouseX={smoothX}
+          mouseY={smoothY}
+        />
+      ))}
     </div>
   );
 };
 
-const GeezChar = ({ data }: { data: CharData }) => (
-  <span
-    className="geez-background-char"
-    style={{
-      left: `${data.x}%`,
-      top: `${data.y}%`,
-      fontSize: `${data.size}rem`,
-      opacity: data.baseOpacity,
-      "--float-duration": `${data.duration}s`,
-      "--float-delay": `${data.delay}s`,
-      "--float-from-x": `${data.driftX * -0.45}px`,
-      "--float-from-y": `${data.driftY * -0.35}px`,
-      "--float-from-rotate": `${data.rotate * -0.45}deg`,
-      "--float-mid-x": `${data.driftX * 0.35}px`,
-      "--float-mid-y": `${data.driftY * 0.5}px`,
-      "--float-mid-rotate": `${data.rotate * 0.35}deg`,
-      "--float-x": `${data.driftX}px`,
-      "--float-y": `${data.driftY}px`,
-      "--float-rotate": `${data.rotate}deg`,
-    } as React.CSSProperties}
-  >
-    {data.char}
-  </span>
-);
+interface GeezCharProps {
+  data: CharData;
+  index: number;
+  mouseX: ReturnType<typeof useSpring>;
+  mouseY: ReturnType<typeof useSpring>;
+}
+
+const GeezChar = ({ data, index, mouseX, mouseY }: GeezCharProps) => {
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    let frame = 0;
+    const animate = () => {
+      if (!ref.current) return;
+
+      const dx = data.x / 100 - mouseX.get();
+      const dy = data.y / 100 - mouseY.get();
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const repelStrength = Math.max(0, 1 - distance / 0.36) * 48;
+      const angle = Math.atan2(dy, dx);
+      const pushX = Math.cos(angle) * repelStrength;
+      const pushY = Math.sin(angle) * repelStrength;
+      const time = Date.now() / 1000;
+      const floatX = Math.sin(time / data.speed + data.offset) * 14;
+      const floatY = Math.cos(time / data.speed + data.offset * 1.3) * 18;
+      const orbitX = Math.sin(time / (data.speed * 1.8) + index) * 9;
+      const orbitY = Math.cos(time / (data.speed * 1.9) + index) * 8;
+      const windX = Math.sin(time * 0.35 + index * 0.35 + data.offset) * 16;
+      const windY = Math.cos(time * 0.28 + index * 0.22 + data.offset) * 20;
+      const glowOpacity = data.baseOpacity + Math.max(0, 1 - distance / 0.24) * 0.24;
+
+      ref.current.style.transform = `translate(${floatX + orbitX + windX + pushX}px, ${floatY + orbitY + windY + pushY}px) rotate(${Math.sin(time / data.speed) * 12}deg)`;
+      ref.current.style.opacity = `${glowOpacity}`;
+      ref.current.style.filter = `drop-shadow(0 0 ${8 + glowOpacity * 16}px hsl(var(--gold) / 0.35))`;
+      frame = requestAnimationFrame(animate);
+    };
+
+    animate();
+    return () => cancelAnimationFrame(frame);
+  }, [data, index, mouseX, mouseY]);
+
+  return (
+    <span
+      ref={ref}
+      className="geez-background-char"
+      style={{
+        left: `${data.x}%`,
+        top: `${data.y}%`,
+        fontSize: `${data.size}rem`,
+        opacity: data.baseOpacity,
+      }}
+    >
+      {data.char}
+    </span>
+  );
+};
 
 export default InteractiveGeezBackground;

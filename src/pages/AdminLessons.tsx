@@ -23,6 +23,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { BookOpenCheck } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminDashboardUi";
 
 const PAGE_SIZE = 8;
 
@@ -177,11 +179,15 @@ const AdminLessons = () => {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-bold md:text-3xl">Lesson Management (CRUD)</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Create, edit, publish, delete, and filter lessons with paging.</p>
-      {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
+      <AdminPageHeader
+        eyebrow="Learning content"
+        title="Lessons and quizzes"
+        description="Create, refine, publish, and organize the learning experiences available in the learner app."
+        icon={BookOpenCheck}
+        error={error}
+      />
 
-      <div className="mt-6 rounded-2xl border border-border bg-card/95 p-5">
+      <div className="mt-6 rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm">
         <h2 className="font-semibold">{editingId ? "Edit lesson" : "Create lesson"}</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <Input aria-label="Lesson title" placeholder="Lesson title" value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} />

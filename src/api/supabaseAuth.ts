@@ -17,6 +17,17 @@ type ProfileRow = {
 const fallbackName = (email?: string | null) =>
   email?.split("@")[0]?.replace(/[._-]/g, " ") || "Learner";
 
+const selectedLanguageStorageKey = (userId: string) => `lingo_selected_language:${userId}`;
+
+const readSavedLanguage = (userId: string): User["selectedLanguage"] | null => {
+  const saved = localStorage.getItem(selectedLanguageStorageKey(userId));
+  return saved === "amharic" || saved === "oromo" || saved === "tigrinya" ? saved : null;
+};
+
+const saveSelectedLanguage = (userId: string, language: User["selectedLanguage"]) => {
+  localStorage.setItem(selectedLanguageStorageKey(userId), language);
+};
+
 const fallbackUser = (authUser: SupabaseUser): User => ({
   id: authUser.id,
   name:
@@ -25,7 +36,7 @@ const fallbackUser = (authUser: SupabaseUser): User => ({
       : fallbackName(authUser.email),
   email: authUser.email || "",
   role: authUser.email?.toLowerCase() === "admin@lingoabyssinia.com" ? "admin" : "learner",
-  selectedLanguage: "amharic",
+  selectedLanguage: readSavedLanguage(authUser.id) || "amharic",
   dailyGoal: 15,
   streak: 0,
   gems: 0,
@@ -57,7 +68,7 @@ export const mapProfileToUser = (
   name: profile.name || fallbackName(profile.email || authUser?.email),
   email: profile.email || authUser?.email || "",
   role: profile.role || "learner",
-  selectedLanguage: profile.selected_language || "amharic",
+  selectedLanguage: readSavedLanguage(profile.id) || profile.selected_language || "amharic",
   dailyGoal: profile.daily_goal || 15,
   streak: profile.streak || 0,
   gems: profile.gems || 0,
@@ -185,6 +196,7 @@ export const updateProfile = async (
   if (updates.name !== undefined) payload.name = updates.name;
   if (updates.email !== undefined) payload.email = updates.email;
   if (updates.selectedLanguage !== undefined) {
+    saveSelectedLanguage(userId, updates.selectedLanguage);
     payload.selected_language = updates.selectedLanguage;
   }
   if (updates.dailyGoal !== undefined) payload.daily_goal = updates.dailyGoal;

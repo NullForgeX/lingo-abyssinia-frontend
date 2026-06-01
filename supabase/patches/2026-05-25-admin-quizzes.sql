@@ -14,8 +14,18 @@ create table if not exists public.admin_quizzes (
   updated_at timestamptz not null default now()
 );
 
-create trigger admin_quizzes_touch_updated_at before update on public.admin_quizzes
-for each row execute function public.touch_updated_at();
+do $$
+begin
+  if not exists (
+    select 1 from pg_trigger
+    where tgname = 'admin_quizzes_touch_updated_at'
+      and tgrelid = 'public.admin_quizzes'::regclass
+      and not tgisinternal
+  ) then
+    create trigger admin_quizzes_touch_updated_at before update on public.admin_quizzes
+    for each row execute function public.touch_updated_at();
+  end if;
+end $$;
 
 alter table public.admin_quizzes enable row level security;
 

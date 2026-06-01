@@ -1,14 +1,25 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpenCheck, ChartNoAxesCombined, LayoutDashboard, ScrollText, ShieldAlert, Users } from "lucide-react";
-import { getAdminAuditLogs, getAdminLessons, getAdminUsersActivity, getModerationReports } from "@/data/adminStore";
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpenCheck,
+  FilePenLine,
+  Languages,
+  LayoutDashboard,
+  PanelsTopLeft,
+  ScrollText,
+  Sparkles,
+  Users,
+} from "lucide-react";
+import { AdminMetricCard, AdminPageHeader } from "@/components/admin/AdminDashboardUi";
+import { getAdminAuditLogs, getAdminLessons, getAdminUsersActivity } from "@/data/adminStore";
 
 const AdminOverview = () => {
   const [lessons, setLessons] = useState<Awaited<ReturnType<typeof getAdminLessons>>>([]);
   const [users, setUsers] = useState<Awaited<ReturnType<typeof getAdminUsersActivity>>>([]);
   const [audit, setAudit] = useState<Awaited<ReturnType<typeof getAdminAuditLogs>>>([]);
-  const [reports, setReports] = useState<Awaited<ReturnType<typeof getModerationReports>>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -17,16 +28,14 @@ const AdminOverview = () => {
       setLoading(true);
       setError("");
       try {
-        const [lessonsData, usersData, auditData, reportsData] = await Promise.all([
+        const [lessonsData, usersData, auditData] = await Promise.all([
           getAdminLessons(),
           getAdminUsersActivity(),
           getAdminAuditLogs(),
-          getModerationReports(),
         ]);
         setLessons(lessonsData);
         setUsers(usersData);
         setAudit(auditData);
-        setReports(reportsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not load admin overview.");
       } finally {
@@ -37,87 +46,124 @@ const AdminOverview = () => {
     load();
   }, []);
 
-  const published = lessons.filter((l) => l.status === "published").length;
-  const drafts = lessons.filter((l) => l.status === "draft").length;
-  const openReports = reports.filter((r) => r.status === "open").length;
+  const published = lessons.filter((lesson) => lesson.status === "published").length;
+  const drafts = lessons.filter((lesson) => lesson.status === "draft").length;
+  const adminUsers = users.filter((user) => user.role === "admin").length;
+  const languageReadiness = (["amharic", "oromo", "tigrinya"] as const).map((language) => {
+    const languageLessons = lessons.filter((lesson) => lesson.language === language);
+    const liveLessons = languageLessons.filter((lesson) => lesson.status === "published").length;
+    return {
+      language,
+      label: language === "oromo" ? "Afan Oromoo" : language.charAt(0).toUpperCase() + language.slice(1),
+      liveLessons,
+      totalLessons: languageLessons.length,
+      readiness: languageLessons.length ? Math.round((liveLessons / languageLessons.length) * 100) : 0,
+    };
+  });
 
   const cards = [
-    { label: "Total Lessons", value: lessons.length, icon: BookOpenCheck },
-    { label: "Published", value: published, icon: LayoutDashboard },
-    { label: "Drafts", value: drafts, icon: ChartNoAxesCombined },
-    { label: "Active Users", value: users.length, icon: Users },
+    { label: "Total lessons", value: lessons.length, helper: `${published} live in the learner app`, icon: BookOpenCheck, tone: "primary" as const },
+    { label: "Published", value: published, helper: `${drafts} drafts awaiting review`, icon: LayoutDashboard, tone: "emerald" as const },
+    { label: "Registered users", value: users.length, helper: `${adminUsers} administrator${adminUsers === 1 ? "" : "s"}`, icon: Users, tone: "secondary" as const },
+    { label: "Draft lessons", value: drafts, helper: drafts ? "Ready for editorial review" : "All content is published", icon: FilePenLine, tone: "accent" as const },
   ];
 
-  const quick = [
-    { title: "Manage Lessons", path: "/admin/lessons", desc: "Create, update, and remove lessons." },
-    { title: "User Activity", path: "/admin/users", desc: "Review learners and manage roles." },
-    { title: "Analytics", path: "/admin/analytics", desc: "Track platform performance." },
+  const quickActions = [
+    { title: "Manage lessons", path: "/admin/lessons", description: "Publish content and maintain quizzes.", icon: FilePenLine },
+    { title: "Open control hub", path: "/admin/hub", description: "Review community and platform health.", icon: PanelsTopLeft },
+    { title: "Explore analytics", path: "/admin/analytics", description: "Track content and learner engagement.", icon: BarChart3 },
   ];
 
   return (
-    <div>
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-secondary/10 to-background p-6 md:p-8">
-        <h1 className="font-display text-2xl font-bold md:text-4xl">Admin Overview</h1>
-        <p className="mt-2 text-muted-foreground">Production-focused controls for content, users, moderation, and auditability.</p>
-        {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
-      </motion.div>
+    <div className="space-y-6">
+      <AdminPageHeader
+        eyebrow="Operations center"
+        title="Welcome to your admin workspace"
+        description="Monitor learner activity, maintain course content, and keep the community healthy from one connected dashboard."
+        icon={Sparkles}
+        error={error}
+        actions={(
+          <Link to="/admin/hub" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5">
+            Open control hub <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+      />
 
       {loading ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Loading admin data...</div>
+        <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">Loading workspace data...</div>
       ) : (
         <>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {cards.map((card) => (
-              <div key={card.label} className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">{card.label}</p>
-                  <card.icon className="h-5 w-5 text-primary" />
-                </div>
-                <p className="mt-2 font-display text-3xl font-bold">{card.value}</p>
-              </div>
-            ))}
-          </div>
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {cards.map((card) => <AdminMetricCard key={card.label} {...card} />)}
+          </section>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {quick.map((item) => (
-              <Link key={item.path} to={item.path} className="group rounded-2xl border border-border bg-card/95 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <h3 className="font-semibold text-foreground">{item.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">Open <ArrowRight className="h-4 w-4" /></span>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl border border-border bg-card/95 p-5">
-              <div className="flex items-center justify-between">
-                <h3 className="inline-flex items-center gap-2 font-semibold text-foreground"><ShieldAlert className="h-4 w-4 text-accent" /> Moderation Queue</h3>
-                <span className="text-sm text-muted-foreground">{openReports} open</span>
+          <section>
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Shortcuts</p>
+                <h2 className="mt-1 font-display text-xl font-bold text-foreground">Move quickly across operations</h2>
               </div>
-              <div className="mt-3 space-y-2">
-                {reports.slice(0, 4).map((r) => (
-                  <div key={r.id} className="rounded-lg border border-border/70 p-3 text-sm">
-                    <p className="font-medium">{r.targetPost}</p>
-                    <p className="text-muted-foreground">{r.reason} by {r.reporter}</p>
-                  </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {quickActions.map((item, index) => (
+                <motion.div key={item.path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}>
+                  <Link to={item.path} className="group flex h-full items-start gap-4 rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-105">
+                      <item.icon className="h-5 w-5" />
+                    </span>
+                    <span>
+                      <span className="flex items-center gap-1 font-semibold text-foreground">{item.title} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+                      <span className="mt-1 block text-sm leading-5 text-muted-foreground">{item.description}</span>
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <section className="grid gap-4 xl:grid-cols-2">
+            <div className="rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Learning catalog</p>
+                <h3 className="mt-1 inline-flex items-center gap-2 font-display text-lg font-bold text-foreground"><Languages className="h-5 w-5 text-secondary" /> Content readiness</h3>
+              </div>
+              <div className="mt-5 space-y-4">
+                {languageReadiness.map((item, index) => (
+                  <motion.div key={item.language} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 + index * 0.08 }}>
+                    <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                      <div>
+                        <p className="font-semibold text-foreground">{item.label}</p>
+                        <p className="text-xs text-muted-foreground">{item.liveLessons} of {item.totalLessons} lessons published</p>
+                      </div>
+                      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">{item.readiness}%</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-muted">
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${item.readiness}%` }} transition={{ delay: 0.2 + index * 0.08, duration: 0.55, ease: "easeOut" }} className="h-full rounded-full bg-gradient-to-r from-primary to-secondary" />
+                    </div>
+                  </motion.div>
                 ))}
-                {reports.length === 0 && <p className="text-sm text-muted-foreground">No reports yet.</p>}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card/95 p-5">
-              <h3 className="inline-flex items-center gap-2 font-semibold text-foreground"><ScrollText className="h-4 w-4 text-primary" /> Recent Audit Logs</h3>
-              <div className="mt-3 space-y-2">
-                {audit.slice(0, 6).map((a) => (
-                  <div key={a.id} className="rounded-lg border border-border/70 p-3 text-sm">
-                    <p className="font-medium">{a.action}</p>
-                    <p className="text-muted-foreground">{a.actor} - {a.target}</p>
+            <div className="rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Accountability</p>
+                <h3 className="mt-1 inline-flex items-center gap-2 font-display text-lg font-bold text-foreground"><ScrollText className="h-5 w-5 text-primary" /> Recent audit activity</h3>
+              </div>
+              <div className="mt-4 space-y-2.5">
+                {audit.slice(0, 5).map((entry) => (
+                  <div key={entry.id} className="flex items-start justify-between gap-3 rounded-xl border border-border/70 bg-background/45 p-3.5 text-sm">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-foreground">{entry.action}</p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">{entry.actor} · {entry.target}</p>
+                    </div>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">{new Date(entry.timestamp).toLocaleDateString()}</span>
                   </div>
                 ))}
-                {audit.length === 0 && <p className="text-sm text-muted-foreground">No audit logs yet.</p>}
+                {audit.length === 0 && <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No audit logs yet.</p>}
               </div>
             </div>
-          </div>
+          </section>
         </>
       )}
     </div>

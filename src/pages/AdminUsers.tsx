@@ -3,6 +3,8 @@ import { AdminUserActivity, getAdminUsersActivity, pushAdminAuditLog, updateAdmi
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { UserRoundSearch } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminDashboardUi";
 
 const PAGE_SIZE = 8;
 
@@ -53,11 +55,15 @@ const AdminUsers = () => {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-bold md:text-3xl">User Activity & Roles</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Monitor learners, filter activity, and manage roles safely.</p>
-      {error && <p className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
+      <AdminPageHeader
+        eyebrow="Access management"
+        title="Users and roles"
+        description="Monitor learner activity, search accounts, and manage administrator access safely."
+        icon={UserRoundSearch}
+        error={error}
+      />
 
-      <div className="mt-6 rounded-2xl border border-border bg-card/95 p-5">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm">
         <div className="mb-4 grid gap-3 md:grid-cols-3">
           <Input aria-label="Search users" placeholder="Search by name or email" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
           <select aria-label="Filter by role" value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value as any); setPage(1); }} className="h-10 rounded-md border border-input bg-background px-3 text-sm">

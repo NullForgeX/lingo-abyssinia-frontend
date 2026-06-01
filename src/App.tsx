@@ -7,42 +7,39 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ChatProvider } from "@/contexts/ChatContext";
+import { PresenceProvider } from "@/contexts/PresenceContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppShell from "./components/AppShell";
 import AdminShell from "./components/AdminShell";
 import ScrollToTop from "./components/ScrollToTop";
+import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import Community from "./pages/Community";
+import Leaderboard from "./pages/Leaderboard";
+import Profile from "./pages/Profile";
+import LanguageSelection from "./pages/LanguageSelection";
+import StreakHistory from "./pages/StreakHistory";
+import BadgeHistory from "./pages/BadgeHistory";
+import SkillProgress from "./pages/SkillProgress";
+import BiteLessons from "./pages/BiteLessons";
+import LessonView from "./pages/LessonView";
+import Login from "./pages/Login";
 
 const Landing = lazy(() => import("./pages/Landing"));
-const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Home = lazy(() => import("./pages/Home"));
-const Community = lazy(() => import("./pages/Community"));
-const Leaderboard = lazy(() => import("./pages/Leaderboard"));
-const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LessonPlayer = lazy(() => import("./pages/LessonPlayer"));
 const LessonResult = lazy(() => import("./pages/LessonResult"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const LanguageSelection = lazy(() => import("./pages/LanguageSelection"));
-const StreakHistory = lazy(() => import("./pages/StreakHistory"));
-const BadgeHistory = lazy(() => import("./pages/BadgeHistory"));
-const SkillProgress = lazy(() => import("./pages/SkillProgress"));
-const BiteLessons = lazy(() => import("./pages/BiteLessons"));
-const LessonView = lazy(() => import("./pages/LessonView"));
 const AdminOverview = lazy(() => import("./pages/AdminOverview"));
 const AdminLessons = lazy(() => import("./pages/AdminLessons"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const AdminContentHub = lazy(() => import("./pages/AdminContentHub"));
-
-const PageLoader = () => (
-  <div className="flex min-h-screen items-center justify-center bg-background px-4">
-    <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/25 border-t-primary" aria-label="Loading" />
-  </div>
-);
+const Chat = lazy(() => import("./pages/Chat"));
 
 const queryClient = new QueryClient();
 
@@ -56,7 +53,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ScrollToTop />
-              <Suspense fallback={<PageLoader />}>
+              <Suspense fallback={<div className="min-h-screen bg-background" />}>
                 <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
@@ -74,12 +71,17 @@ const App = () => (
                 <Route
                   element={
                     <ProtectedRoute allowRoles={["learner"]}>
-                      <AppShell />
+                      <ChatProvider>
+                        <PresenceProvider>
+                          <AppShell />
+                        </PresenceProvider>
+                      </ChatProvider>
                     </ProtectedRoute>
                   }
                 >
                   <Route path="/home" element={<Home />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/chat" element={<Chat />} />
                   <Route path="/bite-lessons" element={<BiteLessons />} />
                   <Route path="/bite-lesson/:language/:lessonId" element={<LessonView />} />
                   <Route path="/community" element={<Community />} />

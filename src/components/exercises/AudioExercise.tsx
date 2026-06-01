@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Volume2, CheckCircle2, XCircle } from "lucide-react";
 import { Exercise } from "@/data/courseContent";
-import { playElevenLabsSpeech, speakWithBrowserFallback } from "@/api/voice";
+import { playAppSpeech } from "@/api/voice";
 
 interface Props {
   exercise: Exercise;
@@ -13,19 +13,13 @@ const AudioExercise = ({ exercise, onAnswer }: Props) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const [voiceError, setVoiceError] = useState("");
 
   const speak = useCallback(async () => {
     if (!exercise.audioText || speaking) return;
     setSpeaking(true);
-    setVoiceError("");
 
     try {
-      await playElevenLabsSpeech(exercise.audioText);
-    } catch (error) {
-      console.error("ElevenLabs playback failed; using browser speech fallback", error);
-      setVoiceError("Using browser voice fallback until ElevenLabs is configured.");
-      await speakWithBrowserFallback(exercise.audioText);
+      await playAppSpeech(exercise.audioText);
     } finally {
       setSpeaking(false);
     }
@@ -58,10 +52,6 @@ const AudioExercise = ({ exercise, onAnswer }: Props) => {
       >
         <Volume2 className={`h-10 w-10 ${speaking ? "text-secondary" : "text-primary"}`} />
       </motion.button>
-
-      {voiceError && (
-        <p className="text-center text-xs text-muted-foreground">{voiceError}</p>
-      )}
 
       <div className="grid gap-3">
         {exercise.options?.map((option, idx) => {
